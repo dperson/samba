@@ -4,7 +4,6 @@ MAINTAINER David Personette <dperson@dperson.com>
 ENV DEBIAN_FRONTEND noninteractive
 
 # Install samba
-COPY samba.sh /usr/bin/
 RUN apt-get update -qq && \
     apt-get install -qqy --no-install-recommends samba && \
     apt-get clean && \
@@ -20,6 +19,7 @@ RUN apt-get update -qq && \
     echo '   force user = smbuser' >> /etc/samba/smb.conf && \
     echo '   force group = users' >> /etc/samba/smb.conf && \
     echo '' >> /etc/samba/smb.conf
+COPY samba.sh /usr/bin/
 
 VOLUME ["/etc/samba"]
 
