@@ -1,10 +1,9 @@
 FROM ubuntu:trusty
 MAINTAINER David Personette <dperson@dperson.com>
 
-ENV DEBIAN_FRONTEND noninteractive
-
 # Install samba
-RUN apt-get update -qq && \
+RUN export DEBIAN_FRONTEND='noninteractive' && \
+    apt-get update -qq && \
     apt-get install -qqy --no-install-recommends samba && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* && \
