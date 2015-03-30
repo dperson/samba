@@ -1,4 +1,4 @@
-FROM ubuntu:trusty
+FROM debian:jessie
 MAINTAINER David Personette <dperson@dperson.com>
 
 # Install samba
