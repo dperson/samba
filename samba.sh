@@ -29,7 +29,7 @@ set -o nounset                              # Treat unset variables as an error
 # Return: result
 share() { local share="$1" path="$2" browse=${3:-yes} ro=${4:-yes}\
                 guest=${5:-yes} users=${6:-""} file=/etc/samba/smb.conf
-    sed -i "/\\[$share\\]/,/^\$/d" $files
+    sed -i "/\\[$share\\]/,/^\$/d" $file
     echo "[$share]" >> $file
     echo "   path = $path" >> $file
     echo "   browseable = $browse" >> $file
@@ -58,7 +58,7 @@ timezone() { local timezone="${1:-EST5EDT}"
 #   name) for user
 #   password) for user
 # Return: user added to container
-user() { local user="${1}" passwd="${2}"
+user() { local name="${1}" passwd="${2}"
     useradd "$name" -M
     echo "$passwd" | tee - | smbpasswd -s -a "$name"
 }
@@ -90,10 +90,11 @@ The 'command' (if provided and valid) will be run instead of samba
     exit $RC
 }
 
-while getopts ":ht:" opt; do
+while getopts ":ht:u:s:" opt; do
     case "$opt" in
         h) usage ;;
         s) eval share $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
+        u) eval user $(sed 's/;/ /g' <<< $OPTARG) ;;
         t) timezone "$OPTARG" ;;
         "?") echo "Unknown option: -$OPTARG"; usage 1 ;;
         ":") echo "No argument value for option: -$OPTARG"; usage 2 ;;
