@@ -27,10 +27,11 @@ OR set local storage:
 ## Configuration
 
     sudo docker run -it --rm dperson/samba -h
-
     Usage: samba.sh [-opt] [command]
     Options (fields in '[]' are optional, '<>' are required):
         -h          This help
+        -i "<path>" Import smbpassword
+                    required arg: "<path>" - full file path in container to import
         -s "<name;/path>[;browse;readonly;guest;users]" Configure a share
                     required arg: "<name>;<comment>;</path>"
                     <name> is how it's called for clients

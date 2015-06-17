@@ -18,6 +18,17 @@
 
 set -o nounset                              # Treat unset variables as an error
 
+### import: import a smbpasswd file
+# Arguments:
+#   file) file to import
+# Return: user(s) added to container
+import() { local name file="${2}"
+    for name in $(cat $file | cut -d: -f1); do
+        useradd "$name" -M
+    done
+    pdbedit -i smbpasswd:$file
+}
+
 ### share: Add share
 # Arguments:
 #   share) share name
@@ -62,6 +73,7 @@ user() { local name="${1}" passwd="${2}"
     useradd "$name" -M
     echo "$passwd" | tee - | smbpasswd -s -a "$name"
 }
+
 ### usage: Help
 # Arguments:
 #   none)
@@ -70,6 +82,8 @@ usage() { local RC=${1:-0}
     echo "Usage: ${0##*/} [-opt] [command]
 Options (fields in '[]' are optional, '<>' are required):
     -h          This help
+    -i \"<path>\" Import smbpassword
+                required arg: \"<path>\" - full file path in container to import
     -s \"<name;/path>[;browse;readonly;guest;users]\" Configure a share
                 required arg: \"<name>;<comment>;</path>\"
                 <name> is how it's called for clients
@@ -90,9 +104,10 @@ The 'command' (if provided and valid) will be run instead of samba
     exit $RC
 }
 
-while getopts ":ht:u:s:" opt; do
+while getopts ":hi:t:u:s:" opt; do
     case "$opt" in
         h) usage ;;
+        i) import "$OPTARG" ;;
         s) eval share $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
         u) eval user $(sed 's/;/ /g' <<< $OPTARG) ;;
         t) timezone "$OPTARG" ;;
