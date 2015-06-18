@@ -22,10 +22,10 @@ set -o nounset                              # Treat unset variables as an error
 # Arguments:
 #   file) file to import
 # Return: user(s) added to container
-import() { local name file="${2}"
-    for name in $(cat $file | cut -d: -f1); do
-        useradd "$name" -M
-    done
+import() { local name id file="${1}"
+    while read name id; do
+        useradd "$name" -M -u "$id"
+    done < <(cut -d: -f1,2 --output-delimiter=' ' $file)
     pdbedit -i smbpasswd:$file
 }
 
