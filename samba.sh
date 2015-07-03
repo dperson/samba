@@ -104,6 +104,8 @@ The 'command' (if provided and valid) will be run instead of samba
     exit $RC
 }
 
+cd /tmp
+
 while getopts ":hi:t:u:s:" opt; do
     case "$opt" in
         h) usage ;;
