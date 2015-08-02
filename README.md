@@ -40,7 +40,7 @@ OR set local storage:
                     [browseable] default:'yes' or 'no'
                     [readonly] default:'yes' or 'no'
                     [guest] allowed default:'yes' or 'no'
-                    [users] allowed default:'all' or list of allowed users
+                    [users] allowed default:'' or list of allowed users
         -t ""       Configure timezone
                     possible arg: "[timezone]" - zoneinfo timezone for container
         -u "<username;password>"       Add a user
