@@ -36,6 +36,7 @@ OR set local storage:
                     required arg: "<name>;<comment>;</path>"
                     <name> is how it's called for clients
                     <path> path to share
+                    NOTE: for the default values, just leave blank
                     [browseable] default:'yes' or 'no'
                     [readonly] default:'yes' or 'no'
                     [guest] allowed default:'yes' or 'no'

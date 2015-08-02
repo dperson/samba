@@ -46,7 +46,7 @@ share() { local share="$1" path="$2" browse=${3:-yes} ro=${4:-yes}\
     echo "   browseable = $browse" >> $file
     echo "   read only = $ro" >> $file
     echo "   guest ok = $guest" >> $file
-    [[ ${users:-""} ]] &&
+    [[ ${users:-""} && ! ${users:-""} =~ all ]] &&
         echo "   valid users = $(tr ',' ' ' <<< $users)" >> $file
     echo -e "" >> $file
 }
@@ -88,6 +88,7 @@ Options (fields in '[]' are optional, '<>' are required):
                 required arg: \"<name>;<comment>;</path>\"
                 <name> is how it's called for clients
                 <path> path to share
+                NOTE: for the default value, just leave blank
                 [browseable] default:'yes' or 'no'
                 [readonly] default:'yes' or 'no'
                 [guest] allowed default:'yes' or 'no'
