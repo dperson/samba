@@ -57,11 +57,15 @@ share() { local share="$1" path="$2" browse=${3:-yes} ro=${4:-yes}\
 # Return: the correct zoneinfo file will be symlinked into place
 timezone() { local timezone="${1:-EST5EDT}"
     [[ -e /usr/share/zoneinfo/$timezone ]] || {
-        echo "ERROR: invalid timezone specified" >&2
+        echo "ERROR: invalid timezone specified: $timezone" >&2
         return
     }
 
-    ln -sf /usr/share/zoneinfo/$timezone /etc/localtime
+    if [[ $(cat /etc/timezone) != $timezone ]]; then
+        echo "$timezone" > /etc/timezone
+        ln -sf /usr/share/zoneinfo/$timezone /etc/localtime
+        dpkg-reconfigure -f noninteractive tzdata
+    fi
 }
 
 ### user: add a user
@@ -120,7 +124,7 @@ while getopts ":hi:t:u:s:" opt; do
 done
 shift $(( OPTIND - 1 ))
 
-[[ "${TIMEZONE:-""}" ]] && timezone "$TIMEZONE"
+[[ "${TZ:-""}" ]] && timezone "$TZ"
 
 if [[ $# -ge 1 && -x $(which $1 2>&-) ]]; then
     exec "$@"

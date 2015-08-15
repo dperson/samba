@@ -52,16 +52,20 @@ OR set local storage:
 
 ENVIROMENT VARIABLES (only available with `docker run`)
 
- * `TIMEZONE` - As above, set a zoneinfo timezone, IE `EST5EDT`
+ * `TZ` - As above, set a zoneinfo timezone, IE `EST5EDT`
 
 ## Examples
-
-### Start an instance and set the timezone:
 
 Any of the commands can be run at creation with `docker run` or later with
 `docker exec samba.sh` (as of version 1.3 of docker).
 
+### Setting the Timezone
+
     sudo docker run -p 139:139 -p 445:445 -d dperson/samba -t EST5EDT
+
+OR using `environment variables`
+
+    sudo docker run -e TZ=EST5EDT -p 139:139 -p 445:445 -d dperson/samba
 
 Will get you the same settings as
 
