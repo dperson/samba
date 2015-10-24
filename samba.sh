@@ -41,14 +41,14 @@ import() { local name id file="${1}"
 share() { local share="$1" path="$2" browse=${3:-yes} ro=${4:-yes}\
                 guest=${5:-yes} users=${6:-""} file=/etc/samba/smb.conf
     sed -i "/\\[$share\\]/,/^\$/d" $file
-    echo "[$share]" >> $file
-    echo "   path = $path" >> $file
-    echo "   browseable = $browse" >> $file
-    echo "   read only = $ro" >> $file
-    echo "   guest ok = $guest" >> $file
+    echo "[$share]" >>$file
+    echo "   path = $path" >>$file
+    echo "   browseable = $browse" >>$file
+    echo "   read only = $ro" >>$file
+    echo "   guest ok = $guest" >>$file
     [[ ${users:-""} && ! ${users:-""} =~ all ]] &&
-        echo "   valid users = $(tr ',' ' ' <<< $users)" >> $file
-    echo -e "" >> $file
+        echo "   valid users = $(tr ',' ' ' <<< $users)" >>$file
+    echo -e "" >>$file
 }
 
 ### timezone: Set the timezone for the container
@@ -62,7 +62,7 @@ timezone() { local timezone="${1:-EST5EDT}"
     }
 
     if [[ $(cat /etc/timezone) != $timezone ]]; then
-        echo "$timezone" > /etc/timezone
+        echo "$timezone" >/etc/timezone
         ln -sf /usr/share/zoneinfo/$timezone /etc/localtime
         dpkg-reconfigure -f noninteractive tzdata >/dev/null 2>&1
     fi
