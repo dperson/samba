@@ -37,6 +37,7 @@ import() { local name id file="${1}"
 #   readonly) 'yes' or 'no'
 #   guest) 'yes' or 'no'
 #   users) list of allowed users
+#   admins) list of admin users
 # Return: result
 share() { local share="$1" path="$2" browse=${3:-yes} ro=${4:-yes}\
                 guest=${5:-yes} users=${6:-""} admins=${7:-"none"} file=/etc/samba/smb.conf
