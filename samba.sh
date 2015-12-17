@@ -39,7 +39,7 @@ import() { local name id file="${1}"
 #   users) list of allowed users
 # Return: result
 share() { local share="$1" path="$2" browse=${3:-yes} ro=${4:-yes}\
-                guest=${5:-yes} users=${6:-""} file=/etc/samba/smb.conf
+                guest=${5:-yes} users=${6:-""} admins=${7:-"none"} file=/etc/samba/smb.conf
     sed -i "/\\[$share\\]/,/^\$/d" $file
     echo "[$share]" >>$file
     echo "   path = $path" >>$file
@@ -48,6 +48,8 @@ share() { local share="$1" path="$2" browse=${3:-yes} ro=${4:-yes}\
     echo "   guest ok = $guest" >>$file
     [[ ${users:-""} && ! ${users:-""} =~ all ]] &&
         echo "   valid users = $(tr ',' ' ' <<< $users)" >>$file
+    [[ ${admins:-""} && ! ${admins:-""} =~ none ]] &&
+        echo "   admin users = $(tr ',' ' ' <<< $admins)" >>$file
     echo -e "" >>$file
 }
 
@@ -97,6 +99,7 @@ Options (fields in '[]' are optional, '<>' are required):
                 [readonly] default:'yes' or 'no'
                 [guest] allowed default:'yes' or 'no'
                 [users] allowed default:'all' or list of allowed users
+                [admins] allowed default:'none' or list of admin users
     -t \"\"       Configure timezone
                 possible arg: \"[timezone]\" - zoneinfo timezone for container
     -u \"<username;password>\"       Add a user
