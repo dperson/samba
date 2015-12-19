@@ -21,8 +21,7 @@ RUN export DEBIAN_FRONTEND='noninteractive' && \
     echo '' >>/etc/samba/smb.conf
 COPY samba.sh /usr/bin/
 
-VOLUME ["/run", "/tmp", "/var/cache", "/var/lib", "/var/log", "/var/tmp", \
-            "/etc/samba"]
+VOLUME ["/etc/samba"]
 
 EXPOSE 139 445
 
