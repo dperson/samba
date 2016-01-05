@@ -39,8 +39,9 @@ import() { local name id file="${1}"
 #   users) list of allowed users
 #   admins) list of admin users
 # Return: result
-share() { local share="$1" path="$2" browse=${3:-yes} ro=${4:-yes}\
-                guest=${5:-yes} users=${6:-""} admins=${7:-"none"} file=/etc/samba/smb.conf
+share() { local share="$1" path="$2" browse=${3:-yes} ro=${4:-yes} \
+                guest=${5:-yes} users=${6:-""} admins=${7:-""} \
+                file=/etc/samba/smb.conf
     sed -i "/\\[$share\\]/,/^\$/d" $file
     echo "[$share]" >>$file
     echo "   path = $path" >>$file
