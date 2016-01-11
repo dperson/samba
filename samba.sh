@@ -92,7 +92,7 @@ Options (fields in '[]' are optional, '<>' are required):
     -h          This help
     -i \"<path>\" Import smbpassword
                 required arg: \"<path>\" - full file path in container to import
-    -s \"<name;/path>[;browse;readonly;guest;users]\" Configure a share
+    -s \"<name;/path>[;browseable;readonly;guest;users]\" Configure a share
                 required arg: \"<name>;<comment>;</path>\"
                 <name> is how it's called for clients
                 <path> path to share
