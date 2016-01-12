@@ -32,12 +32,12 @@ OR set local storage:
         -h          This help
         -i "<path>" Import smbpassword
                     required arg: "<path>" - full file path in container to import
-        -s "<name;/path>[;browse;readonly;guest;users]" Configure a share
+        -s "<name;/path>[;browsable;readonly;guest;users]" Configure a share
                     required arg: "<name>;<comment>;</path>"
                     <name> is how it's called for clients
                     <path> path to share
                     NOTE: for the default values, just leave blank
-                    [browseable] default:'yes' or 'no'
+                    [browsable] default:'yes' or 'no'
                     [readonly] default:'yes' or 'no'
                     [guest] allowed default:'yes' or 'no'
                     [users] allowed default:'all' or list of allowed users

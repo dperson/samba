@@ -33,19 +33,19 @@ import() { local name id file="${1}"
 # Arguments:
 #   share) share name
 #   path) path to share
-#   browseable) 'yes' or 'no'
+#   browsable) 'yes' or 'no'
 #   readonly) 'yes' or 'no'
 #   guest) 'yes' or 'no'
 #   users) list of allowed users
 #   admins) list of admin users
 # Return: result
-share() { local share="$1" path="$2" browse=${3:-yes} ro=${4:-yes} \
+share() { local share="$1" path="$2" browsable=${3:-yes} ro=${4:-yes} \
                 guest=${5:-yes} users=${6:-""} admins=${7:-""} \
                 file=/etc/samba/smb.conf
     sed -i "/\\[$share\\]/,/^\$/d" $file
     echo "[$share]" >>$file
     echo "   path = $path" >>$file
-    echo "   browseable = $browse" >>$file
+    echo "   browsable = $browsable" >>$file
     echo "   read only = $ro" >>$file
     echo "   guest ok = $guest" >>$file
     [[ ${users:-""} && ! ${users:-""} =~ all ]] &&
@@ -92,12 +92,12 @@ Options (fields in '[]' are optional, '<>' are required):
     -h          This help
     -i \"<path>\" Import smbpassword
                 required arg: \"<path>\" - full file path in container to import
-    -s \"<name;/path>[;browse;readonly;guest;users]\" Configure a share
+    -s \"<name;/path>[;browsable;readonly;guest;users]\" Configure a share
                 required arg: \"<name>;<comment>;</path>\"
                 <name> is how it's called for clients
                 <path> path to share
                 NOTE: for the default value, just leave blank
-                [browseable] default:'yes' or 'no'
+                [browsable] default:'yes' or 'no'
                 [readonly] default:'yes' or 'no'
                 [guest] allowed default:'yes' or 'no'
                 [users] allowed default:'all' or list of allowed users
