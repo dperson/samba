@@ -19,6 +19,9 @@ RUN export DEBIAN_FRONTEND='noninteractive' && \
     echo '   force user = smbuser' >>/etc/samba/smb.conf && \
     echo '   force group = users' >>/etc/samba/smb.conf && \
     echo '   load printers = no' >>/etc/samba/smb.conf && \
+    echo '   printing = bsd' >>/etc/samba/smb.conf && \
+    echo '   printcap name = /dev/null' >>/etc/samba/smb.conf && \
+    echo '   disable spoolss = yes' >>/etc/samba/smb.conf && \
     echo '' >>/etc/samba/smb.conf
 COPY samba.sh /usr/bin/
 
