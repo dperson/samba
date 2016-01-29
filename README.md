@@ -16,11 +16,11 @@ By default there are no shares configured, additional ones can be added.
 
 ## Hosting a Samba instance
 
-    sudo docker run -p 139:139 -p 445:445 -d dperson/samba
+    sudo docker run -it -p 139:139 -p 445:445 -d dperson/samba
 
 OR set local storage:
 
-    sudo docker run --name samba -p 139:139 -p 445:445 \
+    sudo docker run -it --name samba -p 139:139 -p 445:445 \
                 -v /path/to/directory:/mount \
                 -d dperson/samba
 
@@ -31,7 +31,7 @@ OR set local storage:
     Options (fields in '[]' are optional, '<>' are required):
         -h          This help
         -i "<path>" Import smbpassword
-                    required arg: "<path>" - full file path in container to import
+                    required arg: "<path>" - full file path in container
         -s "<name;/path>[;browsable;readonly;guest;users]" Configure a share
                     required arg: "<name>;<comment>;</path>"
                     <name> is how it's called for clients
@@ -58,25 +58,25 @@ ENVIRONMENT VARIABLES (only available with `docker run`)
 ## Examples
 
 Any of the commands can be run at creation with `docker run` or later with
-`docker exec samba.sh` (as of version 1.3 of docker).
+`docker exec -it samba.sh` (as of version 1.3 of docker).
 
 ### Setting the Timezone
 
-    sudo docker run -p 139:139 -p 445:445 -d dperson/samba -t EST5EDT
+    sudo docker run -it -p 139:139 -p 445:445 -d dperson/samba -t EST5EDT
 
 OR using `environment variables`
 
-    sudo docker run -e TZ=EST5EDT -p 139:139 -p 445:445 -d dperson/samba
+    sudo docker run -it -e TZ=EST5EDT -p 139:139 -p 445:445 -d dperson/samba
 
 Will get you the same settings as
 
-    sudo docker run --name samba -p 139:139 -p 445:445 -d dperson/samba
-    sudo docker exec samba samba.sh -t EST5EDT ls -AlF /etc/localtime
+    sudo docker run -it --name samba -p 139:139 -p 445:445 -d dperson/samba
+    sudo docker exec -it samba samba.sh -t EST5EDT ls -AlF /etc/localtime
     sudo docker restart samba
 
 ### Start an instance creating users and shares:
 
-    sudo docker run -p 139:139 -p 445:445 -d dperson/samba \
+    sudo docker run -it -p 139:139 -p 445:445 -d dperson/samba \
                 -u "example1;badpass" \
                 -u "example2;badpass" \
                 -s "public;/share" \

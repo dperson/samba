@@ -91,7 +91,7 @@ usage() { local RC=${1:-0}
 Options (fields in '[]' are optional, '<>' are required):
     -h          This help
     -i \"<path>\" Import smbpassword
-                required arg: \"<path>\" - full file path in container to import
+                required arg: \"<path>\" - full file path in container
     -s \"<name;/path>[;browsable;readonly;guest;users]\" Configure a share
                 required arg: \"<name>;<comment>;</path>\"
                 <name> is how it's called for clients
