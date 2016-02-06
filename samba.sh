@@ -138,4 +138,5 @@ elif ps -ef | egrep -v grep | grep -q smbd; then
     echo "Service already running, please restart container to apply changes"
 else
     exec ionice -c 3 smbd -FS
+    exec ionice -c 3 nmbd -FS
 fi
