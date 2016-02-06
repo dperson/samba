@@ -32,6 +32,7 @@ OR set local storage:
         -h          This help
         -i "<path>" Import smbpassword
                     required arg: "<path>" - full file path in container
+        -n          Start the 'nmbd' daemon to advertise the shares
         -s "<name;/path>[;browsable;readonly;guest;users]" Configure a share
                     required arg: "<name>;<comment>;</path>"
                     <name> is how it's called for clients
@@ -53,6 +54,7 @@ OR set local storage:
 
 ENVIRONMENT VARIABLES (only available with `docker run`)
 
+ * `NMBD` - As above, enable nmbd
  * `TZ` - As above, set a zoneinfo timezone, IE `EST5EDT`
 
 ## Examples

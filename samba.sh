@@ -92,6 +92,7 @@ Options (fields in '[]' are optional, '<>' are required):
     -h          This help
     -i \"<path>\" Import smbpassword
                 required arg: \"<path>\" - full file path in container
+    -n          Start the 'nmbd' daemon to advertise the shares
     -s \"<name;/path>[;browsable;readonly;guest;users]\" Configure a share
                 required arg: \"<name>;<comment>;</path>\"
                 <name> is how it's called for clients
@@ -114,10 +115,11 @@ The 'command' (if provided and valid) will be run instead of samba
     exit $RC
 }
 
-while getopts ":hi:t:u:s:" opt; do
+while getopts ":hi:nt:u:s:" opt; do
     case "$opt" in
         h) usage ;;
         i) import "$OPTARG" ;;
+        n) NMBD="true" ;;
         s) eval share $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
         u) eval user $(sed 's/;/ /g' <<< $OPTARG) ;;
         t) timezone "$OPTARG" ;;
@@ -137,5 +139,6 @@ elif [[ $# -ge 1 ]]; then
 elif ps -ef | egrep -v grep | grep -q smbd; then
     echo "Service already running, please restart container to apply changes"
 else
+    [[ $NMBD ]] && ionice -c 3 nmbd -DS
     exec ionice -c 3 smbd -FS
 fi
