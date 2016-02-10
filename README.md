@@ -57,6 +57,9 @@ ENVIRONMENT VARIABLES (only available with `docker run`)
  * `NMBD` - As above, enable nmbd
  * `TZ` - As above, set a zoneinfo timezone, IE `EST5EDT`
 
+**NOTE**: if you enable nmbd (via `-n` or the `NMBD` environment variable), you
+will also want to expose port 137 with `-p 137:137`.
+
 ## Examples
 
 Any of the commands can be run at creation with `docker run` or later with
