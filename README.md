@@ -49,6 +49,9 @@ OR set local storage:
                     required arg: "<username>;<passwd>"
                     <username> for user
                     <password> for user
+        -w "<workgroup>"       Configure the workgroup (domain) samba should use
+                    required arg: "<workgroup>"
+                    <workgroup> for samba
 
     The 'command' (if provided and valid) will be run instead of samba
 
@@ -56,6 +59,7 @@ ENVIRONMENT VARIABLES (only available with `docker run`)
 
  * `NMBD` - As above, enable nmbd
  * `TZ` - As above, set a zoneinfo timezone, IE `EST5EDT`
+ * `WORKGROUP` - As above, set workgroup
 
 **NOTE**: if you enable nmbd (via `-n` or the `NMBD` environment variable), you
 will also want to expose port 137 with `-p 137:137`.

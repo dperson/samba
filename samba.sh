@@ -82,6 +82,14 @@ user() { local name="${1}" passwd="${2}"
     echo "$passwd" | tee - | smbpasswd -s -a "$name"
 }
 
+### workgroup: set the workgroup
+# Arguments:
+#   workgroup) the name to set
+# Return: configure the correct workgroup
+user() { local workgroup="${1}" file=/etc/samba/smb.conf
+    sed -i 's/^\( *workgroup = \).*/\1'"$workgroup"'/' $file
+}
+
 ### usage: Help
 # Arguments:
 #   none)
@@ -109,20 +117,24 @@ Options (fields in '[]' are optional, '<>' are required):
                 required arg: \"<username>;<passwd>\"
                 <username> for user
                 <password> for user
+    -w \"<workgroup>\"       Configure the workgroup (domain) samba should use
+                required arg: \"<workgroup>\"
+                <workgroup> for samba
 
 The 'command' (if provided and valid) will be run instead of samba
 " >&2
     exit $RC
 }
 
-while getopts ":hi:nt:u:s:" opt; do
+while getopts ":hi:ns:t:u:w:" opt; do
     case "$opt" in
         h) usage ;;
         i) import "$OPTARG" ;;
         n) NMBD="true" ;;
         s) eval share $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
-        u) eval user $(sed 's/;/ /g' <<< $OPTARG) ;;
         t) timezone "$OPTARG" ;;
+        u) eval user $(sed 's/;/ /g' <<< $OPTARG) ;;
+        w) workgroup "$OPTARG" ;;
         "?") echo "Unknown option: -$OPTARG"; usage 1 ;;
         ":") echo "No argument value for option: -$OPTARG"; usage 2 ;;
     esac
@@ -130,6 +142,7 @@ done
 shift $(( OPTIND - 1 ))
 
 [[ "${TZ:-""}" ]] && timezone "$TZ"
+[[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
 
 if [[ $# -ge 1 && -x $(which $1 2>&-) ]]; then
     exec "$@"
