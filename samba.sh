@@ -86,7 +86,7 @@ user() { local name="${1}" passwd="${2}"
 # Arguments:
 #   workgroup) the name to set
 # Return: configure the correct workgroup
-user() { local workgroup="${1}" file=/etc/samba/smb.conf
+workgroup() { local workgroup="${1}" file=/etc/samba/smb.conf
     sed -i 's/^\( *workgroup = \).*/\1'"$workgroup"'/' $file
 }
 
