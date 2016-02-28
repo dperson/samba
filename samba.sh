@@ -65,7 +65,7 @@ timezone() { local timezone="${1:-EST5EDT}"
         return
     }
 
-    if [[ $(cat /etc/timezone) != $timezone ]]; then
+    if [[ -w /etc/timezone && $(cat /etc/timezone) != $timezone ]]; then
         echo "$timezone" >/etc/timezone
         ln -sf /usr/share/zoneinfo/$timezone /etc/localtime
         dpkg-reconfigure -f noninteractive tzdata >/dev/null 2>&1
