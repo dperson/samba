@@ -87,7 +87,7 @@ user() { local name="${1}" passwd="${2}"
 #   workgroup) the name to set
 # Return: configure the correct workgroup
 workgroup() { local workgroup="${1}" file=/etc/samba/smb.conf
-    sed -i 's/^\( *workgroup = \).*/\1'"$workgroup"'/' $file
+    sed -i 's|^\( *workgroup = \).*|\1'"$workgroup"'|' $file
 }
 
 ### usage: Help
@@ -133,7 +133,7 @@ while getopts ":hi:ns:t:u:w:" opt; do
         n) NMBD="true" ;;
         s) eval share $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
         t) timezone "$OPTARG" ;;
-        u) eval user $(sed 's/;/ /g' <<< $OPTARG) ;;
+        u) eval user $(sed 's|;| |g' <<< $OPTARG) ;;
         w) workgroup "$OPTARG" ;;
         "?") echo "Unknown option: -$OPTARG"; usage 1 ;;
         ":") echo "No argument value for option: -$OPTARG"; usage 2 ;;
