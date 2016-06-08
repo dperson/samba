@@ -33,6 +33,7 @@ OR set local storage:
         -i "<path>" Import smbpassword
                     required arg: "<path>" - full file path in container
         -n          Start the 'nmbd' daemon to advertise the shares
+        -p          Set ownership and permissions on the shares
         -s "<name;/path>[;browsable;readonly;guest;users]" Configure a share
                     required arg: "<name>;<comment>;</path>"
                     <name> is how it's called for clients

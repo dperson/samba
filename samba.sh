@@ -29,6 +29,18 @@ import() { local name id file="${1}"
     pdbedit -i smbpasswd:$file
 }
 
+### perms: fix ownership and permissions of share paths
+# Arguments:
+#   none)
+# Return: result
+perms() { local i file=/etc/samba/smb.conf
+    for i in $(awk -F ' = ' '/   path = / {print $2}'); do
+        chown -Rh smbuser. $i
+        find $i -type d -exec chmod 775 {} \;
+        find $i -type f -exec chmod 664 {} \;
+    done
+}
+
 ### share: Add share
 # Arguments:
 #   share) share name
@@ -101,6 +113,7 @@ Options (fields in '[]' are optional, '<>' are required):
     -i \"<path>\" Import smbpassword
                 required arg: \"<path>\" - full file path in container
     -n          Start the 'nmbd' daemon to advertise the shares
+    -p          Set ownership and permissions on the shares
     -s \"<name;/path>[;browsable;readonly;guest;users]\" Configure a share
                 required arg: \"<name>;<comment>;</path>\"
                 <name> is how it's called for clients
@@ -126,11 +139,12 @@ The 'command' (if provided and valid) will be run instead of samba
     exit $RC
 }
 
-while getopts ":hi:ns:t:u:w:" opt; do
+while getopts ":hi:nps:t:u:w:" opt; do
     case "$opt" in
         h) usage ;;
         i) import "$OPTARG" ;;
         n) NMBD="true" ;;
+        p) PERMISSIONS="true" ;;
         s) eval share $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
         t) timezone "$OPTARG" ;;
         u) eval user $(sed 's|;| |g' <<< $OPTARG) ;;
@@ -143,6 +157,7 @@ shift $(( OPTIND - 1 ))
 
 [[ "${TZ:-""}" ]] && timezone "$TZ"
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
+[[ "${PERMISSIONS:-""}" ]] && perms
 
 if [[ $# -ge 1 && -x $(which $1 2>&-) ]]; then
     exec "$@"
