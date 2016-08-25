@@ -34,7 +34,7 @@ OR set local storage:
                     required arg: "<path>" - full file path in container
         -n          Start the 'nmbd' daemon to advertise the shares
         -p          Set ownership and permissions on the shares
-        -s "<name;/path>[;browsable;readonly;guest;users]" Configure a share
+        -s "<name;/path>[;browsable;readonly;guest;users;admins]" Configure a share
                     required arg: "<name>;<comment>;</path>"
                     <name> is how it's called for clients
                     <path> path to share
