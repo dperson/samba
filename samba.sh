@@ -88,9 +88,10 @@ timezone() { local timezone="${1:-EST5EDT}"
 # Arguments:
 #   name) for user
 #   password) for user
+#   id) for user
 # Return: user added to container
-user() { local name="${1}" passwd="${2}"
-    useradd "$name" -M
+user() { local name="${1}" passwd="${2}" id="${3:-""}"
+    useradd "$name" -M ${id:+-u $id}
     echo "$passwd" | tee - | smbpasswd -s -a "$name"
 }
 
@@ -130,6 +131,7 @@ Options (fields in '[]' are optional, '<>' are required):
                 required arg: \"<username>;<passwd>\"
                 <username> for user
                 <password> for user
+                [ID] for user
     -w \"<workgroup>\"       Configure the workgroup (domain) samba should use
                 required arg: \"<workgroup>\"
                 <workgroup> for samba

@@ -50,6 +50,7 @@ OR set local storage:
                     required arg: "<username>;<passwd>"
                     <username> for user
                     <password> for user
+                    [ID] for user
         -w "<workgroup>"       Configure the workgroup (domain) samba should use
                     required arg: "<workgroup>"
                     <workgroup> for samba
