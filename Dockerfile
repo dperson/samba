@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:stretch
 MAINTAINER David Personette <dperson@gmail.com>
 
 # Install samba
