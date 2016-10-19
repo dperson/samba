@@ -92,7 +92,7 @@ timezone() { local timezone="${1:-EST5EDT}"
 # Return: user added to container
 user() { local name="${1}" passwd="${2}" id="${3:-""}"
     useradd "$name" -M ${id:+-u $id}
-    echo "$passwd" | tee - | smbpasswd -s -a "$name"
+    printf "$passwd\n$passwd\n" | tee - | smbpasswd -s -a "$name"
 }
 
 ### workgroup: set the workgroup
