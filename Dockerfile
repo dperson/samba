@@ -4,7 +4,7 @@ MAINTAINER David Personette <dperson@gmail.com>
 # Install samba
 RUN export DEBIAN_FRONTEND='noninteractive' && \
     apt-get update -qq && \
-    apt-get install -qqy --no-install-recommends samba \
+    apt-get install -qqy --no-install-recommends psutils samba \
                 $(apt-get -s dist-upgrade|awk '/^Inst.*ecurity/ {print $2}') &&\
     useradd -c 'Samba User' -d /tmp -M -r smbuser && \
     sed -i 's|^\(   log file = \).*|\1/dev/stdout|' /etc/samba/smb.conf && \
