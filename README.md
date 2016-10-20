@@ -64,7 +64,7 @@ ENVIRONMENT VARIABLES (only available with `docker run`)
  * `WORKGROUP` - As above, set workgroup
 
 **NOTE**: if you enable nmbd (via `-n` or the `NMBD` environment variable), you
-will also want to expose port 137 with `-p 137:137`.
+will also want to expose port 137 and 138 with `-p 137:137/udp -p 138:138/udp`.
 
 ## Examples
 
