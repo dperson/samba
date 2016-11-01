@@ -67,6 +67,18 @@ share() { local share="$1" path="$2" browsable=${3:-yes} ro=${4:-yes} \
     echo -e "" >>$file
 }
 
+### homes: Add special [homes] share
+# Arguments: none
+homes() { local file=/etc/samba/smb.conf
+    sed -i "/\\[homes\\]/,/^\$/d" $file
+    echo "[homes]" >>$file
+    echo "    comment = Home Directories" >>$file
+    echo "    browseable = no" >>$file
+    echo "    writable = yes" >>$file
+    echo "    follow symlinks = yes" >>$file
+    echo -e "" >>$file
+}
+
 ### timezone: Set the timezone for the container
 # Arguments:
 #   timezone) for example EST5EDT
@@ -125,6 +137,8 @@ Options (fields in '[]' are optional, '<>' are required):
                 [guest] allowed default:'yes' or 'no'
                 [users] allowed default:'all' or list of allowed users
                 [admins] allowed default:'none' or list of admin users
+    -m          Enable homedir sharing for users (defined below).  Mount your
+                users' homedirs at /home
     -t \"\"       Configure timezone
                 possible arg: \"[timezone]\" - zoneinfo timezone for container
     -u \"<username;password>\"       Add a user
@@ -141,13 +155,14 @@ The 'command' (if provided and valid) will be run instead of samba
     exit $RC
 }
 
-while getopts ":hi:nps:t:u:w:" opt; do
+while getopts ":hi:nps:mt:u:w:" opt; do
     case "$opt" in
         h) usage ;;
         i) import "$OPTARG" ;;
         n) NMBD="true" ;;
         p) PERMISSIONS="true" ;;
         s) eval share $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
+        m) homes ;;
         t) timezone "$OPTARG" ;;
         u) eval user $(sed 's|;| |g' <<< $OPTARG) ;;
         w) workgroup "$OPTARG" ;;
