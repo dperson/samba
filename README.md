@@ -44,6 +44,8 @@ OR set local storage:
                     [guest] allowed default:'yes' or 'no'
                     [users] allowed default:'all' or list of allowed users
                     [admins] allowed default:'none' or list of admin users
+        -m          Enable homedir sharing for users (defined below).  Mount your
+                    users' homedirs at /home
         -t ""       Configure timezone
                     possible arg: "[timezone]" - zoneinfo timezone for container
         -u "<username;password>"       Add a user
@@ -94,6 +96,18 @@ Will get you the same settings as
                 -s "users;/srv;no;no;no;example1,example2" \
                 -s "example1 private;/example1;no;no;no;example1" \
                 -s "example2 private;/example2;no;no;no;example2"
+
+### Sharing home directories
+
+Ensure that `/home` in the container is mounted to some place where
+you want your homedirs to live, or the actual homedirs on the local host.
+
+You will also need to add the UIDs of each user, matching those in `/home/`.
+
+    sudo docker run -it -p 139:139 -p 445:445 -v /home:/home -d dperson/samba \
+                -u "example1;badpass;1000" \
+                -u "example2;badpass;1050" \
+                -m
 
 # User Feedback
 
