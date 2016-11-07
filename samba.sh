@@ -29,6 +29,15 @@ import() { local name id file="${1}"
     pdbedit -i smbpasswd:$file
 }
 
+### follow_symlinks: Enable insecure symlink following
+# Arguments:
+#   none)
+# Return: smb.conf updated accordingly
+follow_symlinks() { local file=/etc/samba/smb.conf
+    sed -i -e 's/^\(\s*\)\(workgroup\)/\1allow insecure wide links = yes\n\1\2/' $file
+}
+
+
 ### perms: fix ownership and permissions of share paths
 # Arguments:
 #   none)
@@ -64,6 +73,10 @@ share() { local share="$1" path="$2" browsable=${3:-yes} ro=${4:-yes} \
         echo "   valid users = $(tr ',' ' ' <<< $users)" >>$file
     [[ ${admins:-""} && ! ${admins:-""} =~ none ]] &&
         echo "   admin users = $(tr ',' ' ' <<< $admins)" >>$file
+    if [ "${FOLLOW_LINKS}" = "true" ]; then
+        echo "   follow symlinks = yes" >>$file
+        echo "   wide links = yes" >>$file
+    fi
     echo -e "" >>$file
 }
 
@@ -75,8 +88,16 @@ homes() { local file=/etc/samba/smb.conf
     echo "    comment = Home Directories" >>$file
     echo "    browseable = no" >>$file
     echo "    writable = yes" >>$file
-    echo "    follow symlinks = yes" >>$file
+    if [ "${FOLLOW_LINKS}" = "true" ]; then
+        echo "    follow symlinks = yes" >>$file
+        echo "    wide links = yes" >> $file
+    fi
     echo -e "" >>$file
+
+    # We also have to disable the 'force user' and
+    # 'force group' options if we want homedirs
+    # to work properly with their owners
+    sed -i -e '/force \(user\|group\)/d' $file
 }
 
 ### timezone: Set the timezone for the container
@@ -127,6 +148,8 @@ Options (fields in '[]' are optional, '<>' are required):
                 required arg: \"<path>\" - full file path in container
     -n          Start the 'nmbd' daemon to advertise the shares
     -p          Set ownership and permissions on the shares
+    -l          Enable following of symlinks + wide links for any
+                shares or homedirs specified after this option (insecure!)
     -s \"<name;/path>[;browsable;readonly;guest;users;admins]\" Configure a share
                 required arg: \"<name>;<comment>;</path>\"
                 <name> is how it's called for clients
@@ -161,6 +184,7 @@ while getopts ":hi:nps:mt:u:w:" opt; do
         i) import "$OPTARG" ;;
         n) NMBD="true" ;;
         p) PERMISSIONS="true" ;;
+        l) FOLLOW_LINKS="true" && follow_symlinks ;;
         s) eval share $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
         m) homes ;;
         t) timezone "$OPTARG" ;;
