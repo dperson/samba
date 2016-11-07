@@ -117,14 +117,23 @@ timezone() { local timezone="${1:-EST5EDT}"
     fi
 }
 
+### group: add a group
+# Arguments:
+#   name) for group
+#   gid) for group
+# Return: group added to container
+group() { local name="${1}" id="${2:-""}"
+    groupadd ${id:+-g $id} "$name"
+}
+
 ### user: add a user
 # Arguments:
 #   name) for user
 #   password) for user
 #   id) for user
 # Return: user added to container
-user() { local name="${1}" passwd="${2}" id="${3:-""}"
-    useradd "$name" -M ${id:+-u $id}
+user() { local name="${1}" passwd="${2}" id="${3:-""}" groups="${4:-""}"
+    useradd "$name" -M ${id:+-u $id} ${groups:+-G $groups}
     echo -e "$passwd\n$passwd" | smbpasswd -s -a "$name"
 }
 
@@ -164,11 +173,16 @@ Options (fields in '[]' are optional, '<>' are required):
                 users' homedirs at /home
     -t \"\"       Configure timezone
                 possible arg: \"[timezone]\" - zoneinfo timezone for container
-    -u \"<username;password>\"       Add a user
+    -g \"<group>[;gid]\"                         Add a group
+                required arg: \"<group>\"
+                <group> name of group
+                [gid] set a specific GID
+    -u \"<username;password>[;id;group,group]\"  Add a user
                 required arg: \"<username>;<passwd>\"
                 <username> for user
                 <password> for user
-                [ID] for user
+                [id] UID for user
+                [group,group] supplementary groups for user
     -w \"<workgroup>\"       Configure the workgroup (domain) samba should use
                 required arg: \"<workgroup>\"
                 <workgroup> for samba
@@ -178,7 +192,7 @@ The 'command' (if provided and valid) will be run instead of samba
     exit $RC
 }
 
-while getopts ":hi:npls:mt:u:w:" opt; do
+while getopts ":hi:npls:mt:g:u:w:" opt; do
     case "$opt" in
         h) usage ;;
         i) import "$OPTARG" ;;
@@ -188,6 +202,7 @@ while getopts ":hi:npls:mt:u:w:" opt; do
         s) eval share $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
         m) homes ;;
         t) timezone "$OPTARG" ;;
+        g) eval group $(sed 's|;| |g' <<< $OPTARG) ;;
         u) eval user $(sed 's|;| |g' <<< $OPTARG) ;;
         w) workgroup "$OPTARG" ;;
         "?") echo "Unknown option: -$OPTARG"; usage 1 ;;
