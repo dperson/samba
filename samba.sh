@@ -169,7 +169,7 @@ The 'command' (if provided and valid) will be run instead of samba
     exit $RC
 }
 
-while getopts ":hi:npls:mt:g:u:w:" opt; do
+while getopts ":hi:nps:mt:g:u:w:" opt; do
     case "$opt" in
         h) usage ;;
         i) import "$OPTARG" ;;
