@@ -29,6 +29,15 @@ import() { local name id file="${1}"
     pdbedit -i smbpasswd:$file
 }
 
+### follow_symlinks: Enable insecure symlink following
+# Arguments:
+#   none)
+# Return: smb.conf updated accordingly
+follow_symlinks() { local file=/etc/samba/smb.conf
+    sed -i -e 's/^\(\s*\)\(workgroup\)/\1allow insecure wide links = yes\n\1\2/' $file
+}
+
+
 ### perms: fix ownership and permissions of share paths
 # Arguments:
 #   none)
@@ -64,7 +73,31 @@ share() { local share="$1" path="$2" browsable=${3:-yes} ro=${4:-yes} \
         echo "   valid users = $(tr ',' ' ' <<< $users)" >>$file
     [[ ${admins:-""} && ! ${admins:-""} =~ none ]] &&
         echo "   admin users = $(tr ',' ' ' <<< $admins)" >>$file
+    if [ "${FOLLOW_LINKS}" = "true" ]; then
+        echo "   follow symlinks = yes" >>$file
+        echo "   wide links = yes" >>$file
+    fi
     echo -e "" >>$file
+}
+
+### homes: Add special [homes] share
+# Arguments: none
+homes() { local file=/etc/samba/smb.conf
+    sed -i "/\\[homes\\]/,/^\$/d" $file
+    echo "[homes]" >>$file
+    echo "    comment = Home Directories" >>$file
+    echo "    browseable = no" >>$file
+    echo "    writable = yes" >>$file
+    if [ "${FOLLOW_LINKS}" = "true" ]; then
+        echo "    follow symlinks = yes" >>$file
+        echo "    wide links = yes" >> $file
+    fi
+    echo -e "" >>$file
+
+    # We also have to disable the 'force user' and
+    # 'force group' options if we want homedirs
+    # to work properly with their owners
+    sed -i -e '/force \(user\|group\)/d' $file
 }
 
 ### timezone: Set the timezone for the container
@@ -84,14 +117,23 @@ timezone() { local timezone="${1:-EST5EDT}"
     fi
 }
 
+### group: add a group
+# Arguments:
+#   name) for group
+#   gid) for group
+# Return: group added to container
+group() { local name="${1}" id="${2:-""}"
+    groupadd ${id:+-g $id} "$name"
+}
+
 ### user: add a user
 # Arguments:
 #   name) for user
 #   password) for user
 #   id) for user
 # Return: user added to container
-user() { local name="${1}" passwd="${2}" id="${3:-""}"
-    useradd "$name" -M ${id:+-u $id}
+user() { local name="${1}" passwd="${2}" id="${3:-""}" groups="${4:-""}"
+    useradd "$name" -M ${id:+-u $id} ${groups:+-G $groups}
     echo -e "$passwd\n$passwd" | smbpasswd -s -a "$name"
 }
 
@@ -115,6 +157,8 @@ Options (fields in '[]' are optional, '<>' are required):
                 required arg: \"<path>\" - full file path in container
     -n          Start the 'nmbd' daemon to advertise the shares
     -p          Set ownership and permissions on the shares
+    -l          Enable following of symlinks + wide links for any
+                shares or homedirs specified after this option (insecure!)
     -s \"<name;/path>[;browsable;readonly;guest;users;admins]\" Configure a share
                 required arg: \"<name>;<comment>;</path>\"
                 <name> is how it's called for clients
@@ -125,13 +169,20 @@ Options (fields in '[]' are optional, '<>' are required):
                 [guest] allowed default:'yes' or 'no'
                 [users] allowed default:'all' or list of allowed users
                 [admins] allowed default:'none' or list of admin users
+    -m          Enable homedir sharing for users (defined below).  Mount your
+                users' homedirs at /home
     -t \"\"       Configure timezone
                 possible arg: \"[timezone]\" - zoneinfo timezone for container
-    -u \"<username;password>\"       Add a user
+    -g \"<group>[;gid]\"                         Add a group
+                required arg: \"<group>\"
+                <group> name of group
+                [gid] set a specific GID
+    -u \"<username;password>[;id;group,group]\"  Add a user
                 required arg: \"<username>;<passwd>\"
                 <username> for user
                 <password> for user
-                [ID] for user
+                [id] UID for user
+                [group,group] supplementary groups for user
     -w \"<workgroup>\"       Configure the workgroup (domain) samba should use
                 required arg: \"<workgroup>\"
                 <workgroup> for samba
@@ -141,14 +192,17 @@ The 'command' (if provided and valid) will be run instead of samba
     exit $RC
 }
 
-while getopts ":hi:nps:t:u:w:" opt; do
+while getopts ":hi:npls:mt:g:u:w:" opt; do
     case "$opt" in
         h) usage ;;
         i) import "$OPTARG" ;;
         n) NMBD="true" ;;
         p) PERMISSIONS="true" ;;
+        l) FOLLOW_LINKS="true" && follow_symlinks ;;
         s) eval share $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
+        m) homes ;;
         t) timezone "$OPTARG" ;;
+        g) eval group $(sed 's|;| |g' <<< $OPTARG) ;;
         u) eval user $(sed 's|;| |g' <<< $OPTARG) ;;
         w) workgroup "$OPTARG" ;;
         "?") echo "Unknown option: -$OPTARG"; usage 1 ;;
