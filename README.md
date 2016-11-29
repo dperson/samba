@@ -30,6 +30,8 @@ OR set local storage:
     Usage: samba.sh [-opt] [command]
     Options (fields in '[]' are optional, '<>' are required):
         -h          This help
+        -c "<from:to>" setup character mapping for file/directory names
+                    required arg: "<from:to>" character mappings separated by ','
         -i "<path>" Import smbpassword
                     required arg: "<path>" - full file path in container
         -n          Start the 'nmbd' daemon to advertise the shares
@@ -59,6 +61,7 @@ OR set local storage:
 
 ENVIRONMENT VARIABLES (only available with `docker run`)
 
+ * `CHARMAP` - As above, configure character mapping
  * `NMBD` - As above, enable nmbd
  * `TZ` - As above, set a zoneinfo timezone, IE `EST5EDT`
  * `WORKGROUP` - As above, set workgroup

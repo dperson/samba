@@ -18,11 +18,26 @@
 
 set -o nounset                              # Treat unset variables as an error
 
+### charmap: setup character mapping for file/directory names
+# Arguments:
+#   chars) from:to character mappings separated by ','
+# Return: configured character mapings
+charmap() { local chars="$1" file=/etc/samba/smb.conf
+    grep -q catia $file || sed -i '/TCP_NODELAY/a \
+\
+    vfs objects = catia\
+    catia:mappings =\
+
+                ' $file
+
+    sed -i '/catia:mappings/s/ =.*/ = '"$chars" $file
+}
+
 ### import: import a smbpasswd file
 # Arguments:
 #   file) file to import
 # Return: user(s) added to container
-import() { local name id file="${1}"
+import() { local name id file="$1"
     while read name id; do
         useradd "$name" -M -u "$id"
     done < <(cut -d: -f1,2 --output-delimiter=' ' $file)
@@ -64,7 +79,7 @@ share() { local share="$1" path="$2" browsable=${3:-yes} ro=${4:-yes} \
         echo "   valid users = $(tr ',' ' ' <<< $users)" >>$file
     [[ ${admins:-""} && ! ${admins:-""} =~ none ]] &&
         echo "   admin users = $(tr ',' ' ' <<< $admins)" >>$file
-    echo -e "" >>$file
+    echo "" >>$file
 }
 
 ### timezone: Set the timezone for the container
@@ -111,6 +126,8 @@ usage() { local RC=${1:-0}
     echo "Usage: ${0##*/} [-opt] [command]
 Options (fields in '[]' are optional, '<>' are required):
     -h          This help
+    -c \"<from:to>\" setup character mapping for file/directory names
+                required arg: \"<from:to>\" character mappings separated by ','
     -i \"<path>\" Import smbpassword
                 required arg: \"<path>\" - full file path in container
     -n          Start the 'nmbd' daemon to advertise the shares
@@ -141,9 +158,10 @@ The 'command' (if provided and valid) will be run instead of samba
     exit $RC
 }
 
-while getopts ":hi:nps:t:u:w:" opt; do
+while getopts ":hc:i:nps:t:u:w:" opt; do
     case "$opt" in
         h) usage ;;
+        c) charmap "$OPTARG" ;;
         i) import "$OPTARG" ;;
         n) NMBD="true" ;;
         p) PERMISSIONS="true" ;;
@@ -157,6 +175,7 @@ while getopts ":hi:nps:t:u:w:" opt; do
 done
 shift $(( OPTIND - 1 ))
 
+[[ "${CHARMAP:-""}" ]] && charmap "$CHARMAP"
 [[ "${TZ:-""}" ]] && timezone "$TZ"
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
 [[ "${PERMISSIONS:-""}" ]] && perms
