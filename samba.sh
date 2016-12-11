@@ -65,10 +65,11 @@ perms() { local i file=/etc/samba/smb.conf
 #   guest) 'yes' or 'no'
 #   users) list of allowed users
 #   admins) list of admin users
+#   writelist) list of users that can write to a RO share
 # Return: result
 share() { local share="$1" path="$2" browsable=${3:-yes} ro=${4:-yes} \
                 guest=${5:-yes} users=${6:-""} admins=${7:-""} \
-                file=/etc/samba/smb.conf
+                writelist=${8:-""} file=/etc/samba/smb.conf
     sed -i "/\\[$share\\]/,/^\$/d" $file
     echo "[$share]" >>$file
     echo "   path = $path" >>$file
@@ -79,6 +80,8 @@ share() { local share="$1" path="$2" browsable=${3:-yes} ro=${4:-yes} \
         echo "   valid users = $(tr ',' ' ' <<< $users)" >>$file
     [[ ${admins:-""} && ! ${admins:-""} =~ none ]] &&
         echo "   admin users = $(tr ',' ' ' <<< $admins)" >>$file
+    [[ ${writelist:-""} && ! ${writelist:-""} =~ none ]] &&
+        echo "   write list = $(tr ',' ' ' <<< $writelist)" >>$file
     echo "" >>$file
 }
 
@@ -105,8 +108,9 @@ timezone() { local timezone="${1:-EST5EDT}"
 #   password) for user
 #   id) for user
 # Return: user added to container
-user() { local name="${1}" passwd="${2}" id="${3:-""}"
-    useradd "$name" -M ${id:+-u $id}
+user() { local name="${1}" passwd="${2}" id="${3:-""}" group="${4:-""}"
+    grep -q "^$group:" /etc/group || groupadd "$group"
+    useradd "$name" -M ${id:+-u $id} ${group:+-g $group}
     echo -e "$passwd\n$passwd" | smbpasswd -s -a "$name"
 }
 
@@ -132,7 +136,7 @@ Options (fields in '[]' are optional, '<>' are required):
                 required arg: \"<path>\" - full file path in container
     -n          Start the 'nmbd' daemon to advertise the shares
     -p          Set ownership and permissions on the shares
-    -s \"<name;/path>[;browsable;readonly;guest;users;admins]\" Configure a share
+    -s \"<name;/path>[;browse;readonly;guest;users;admins;wl]\" Config a share
                 required arg: \"<name>;<comment>;</path>\"
                 <name> is how it's called for clients
                 <path> path to share
@@ -142,13 +146,15 @@ Options (fields in '[]' are optional, '<>' are required):
                 [guest] allowed default:'yes' or 'no'
                 [users] allowed default:'all' or list of allowed users
                 [admins] allowed default:'none' or list of admin users
+                [writelist] list of users that can write to a RO share
     -t \"\"       Configure timezone
                 possible arg: \"[timezone]\" - zoneinfo timezone for container
-    -u \"<username;password>\"       Add a user
+    -u \"<username;password>[;ID;group]\"       Add a user
                 required arg: \"<username>;<passwd>\"
                 <username> for user
                 <password> for user
                 [ID] for user
+                [group] for user
     -w \"<workgroup>\"       Configure the workgroup (domain) samba should use
                 required arg: \"<workgroup>\"
                 <workgroup> for samba

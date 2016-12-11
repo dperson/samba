@@ -36,7 +36,7 @@ OR set local storage:
                     required arg: "<path>" - full file path in container
         -n          Start the 'nmbd' daemon to advertise the shares
         -p          Set ownership and permissions on the shares
-        -s "<name;/path>[;browsable;readonly;guest;users;admins]" Configure a share
+        -s "<name;/path>[;browse;readonly;guest;users;admins;wl]" Config a share
                     required arg: "<name>;<comment>;</path>"
                     <name> is how it's called for clients
                     <path> path to share
@@ -46,13 +46,15 @@ OR set local storage:
                     [guest] allowed default:'yes' or 'no'
                     [users] allowed default:'all' or list of allowed users
                     [admins] allowed default:'none' or list of admin users
+                    [writelist] list of users that can write to a RO share
         -t ""       Configure timezone
                     possible arg: "[timezone]" - zoneinfo timezone for container
-        -u "<username;password>"       Add a user
+        -u "<username;password>[;ID;group]"       Add a user
                     required arg: "<username>;<passwd>"
                     <username> for user
                     <password> for user
                     [ID] for user
+                    [group] for user
         -w "<workgroup>"       Configure the workgroup (domain) samba should use
                     required arg: "<workgroup>"
                     <workgroup> for samba
