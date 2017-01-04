@@ -67,6 +67,8 @@ ENVIRONMENT VARIABLES (only available with `docker run`)
  * `NMBD` - As above, enable nmbd
  * `TZ` - As above, set a zoneinfo timezone, IE `EST5EDT`
  * `WORKGROUP` - As above, set workgroup
+ * `USERID` - Set the UID for the samba server
+ * `GROUPID` - Set the GID for the samba server
 
 **NOTE**: if you enable nmbd (via `-n` or the `NMBD` environment variable), you
 will also want to expose port 137 and 138 with `-p 137:137/udp -p 138:138/udp`.
