@@ -109,7 +109,7 @@ timezone() { local timezone="${1:-EST5EDT}"
 #   id) for user
 # Return: user added to container
 user() { local name="${1}" passwd="${2}" id="${3:-""}" group="${4:-""}"
-    grep -q "^$group:" /etc/group || groupadd "$group"
+    [[ "$group" ]] && { grep -q "^$group:" /etc/group || groupadd "$group"; }
     useradd "$name" -M ${id:+-u $id} ${group:+-g $group}
     echo -e "$passwd\n$passwd" | smbpasswd -s -a "$name"
 }
