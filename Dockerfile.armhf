@@ -1,4 +1,4 @@
-FROM aarch64/debian:stretch
+FROM armhf/debian:stretch
 MAINTAINER David Personette <dperson@gmail.com>
 
 # Install samba
