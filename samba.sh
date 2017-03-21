@@ -107,6 +107,7 @@ timezone() { local timezone="${1:-EST5EDT}"
 #   name) for user
 #   password) for user
 #   id) for user
+#   group) for user
 # Return: user added to container
 user() { local name="${1}" passwd="${2}" id="${3:-""}" group="${4:-""}"
     [[ "$group" ]] && { grep -q "^$group:" /etc/group || groupadd "$group"; }
