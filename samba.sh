@@ -76,6 +76,8 @@ share() { local share="$1" path="$2" browsable=${3:-yes} ro=${4:-yes} \
     echo "   browsable = $browsable" >>$file
     echo "   read only = $ro" >>$file
     echo "   guest ok = $guest" >>$file
+    echo "   veto files = /._*/.DS_Store/" >>$file
+    echo "   delete veto files = yes" >>$file
     [[ ${users:-""} && ! ${users:-""} =~ all ]] &&
         echo "   valid users = $(tr ',' ' ' <<< $users)" >>$file
     [[ ${admins:-""} && ! ${admins:-""} =~ none ]] &&
