@@ -25,7 +25,7 @@ RUN export DEBIAN_FRONTEND='noninteractive' && \
     echo '' >>/etc/samba/smb.conf && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
-COPY samba.sh /usr/bin/
+COPY samba.sh /usr/local/bin/
 
 VOLUME ["/etc/samba"]
 
