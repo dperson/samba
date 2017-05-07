@@ -23,6 +23,7 @@ RUN export DEBIAN_FRONTEND='noninteractive' && \
     echo '   printcap name = /dev/null' >>/etc/samba/smb.conf && \
     echo '   disable spoolss = yes' >>/etc/samba/smb.conf && \
     echo '   socket options = TCP_NODELAY' >>/etc/samba/smb.conf && \
+    echo '   strict locking = no' >>/etc/samba/smb.conf && \
     echo '' >>/etc/samba/smb.conf && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
