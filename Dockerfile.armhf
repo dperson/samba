@@ -24,6 +24,9 @@ RUN export DEBIAN_FRONTEND='noninteractive' && \
     echo '   disable spoolss = yes' >>/etc/samba/smb.conf && \
     echo '   socket options = TCP_NODELAY' >>/etc/samba/smb.conf && \
     echo '   strict locking = no' >>/etc/samba/smb.conf && \
+    echo '   vfs objects = recycle' >>/etc/samba/smb.conf && \
+    echo '   recycle:keeptree = yes' >>/etc/samba/smb.conf && \
+    echo '   recycle:versions = yes' >>/etc/samba/smb.conf && \
     echo '' >>/etc/samba/smb.conf && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
