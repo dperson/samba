@@ -36,6 +36,7 @@ OR set local storage:
                     required arg: "<path>" - full file path in container
         -n          Start the 'nmbd' daemon to advertise the shares
         -p          Set ownership and permissions on the shares
+        -r          Disable recycle bin for shares
         -s "<name;/path>[;browse;readonly;guest;users;admins;wl]" Config a share
                     required arg: "<name>;<comment>;</path>"
                     <name> is how it's called for clients
