@@ -56,6 +56,14 @@ perms() { local i file=/etc/samba/smb.conf
     done
 }
 
+### recycle: disable recycle bin
+# Arguments:
+#   none)
+# Return: result
+recycle() { local file=/etc/samba/smb.conf
+    sed -i '/recycle/d; /vfs/d' $file
+}
+
 ### share: Add share
 # Arguments:
 #   share) share name
@@ -141,6 +149,7 @@ Options (fields in '[]' are optional, '<>' are required):
                 required arg: \"<path>\" - full file path in container
     -n          Start the 'nmbd' daemon to advertise the shares
     -p          Set ownership and permissions on the shares
+    -r          Disable recycle bin for shares
     -s \"<name;/path>[;browse;readonly;guest;users;admins;wl]\" Config a share
                 required arg: \"<name>;<comment>;</path>\"
                 <name> is how it's called for clients
@@ -172,13 +181,14 @@ The 'command' (if provided and valid) will be run instead of samba
 [[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
 [[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o users
 
-while getopts ":hc:i:nps:t:u:w:" opt; do
+while getopts ":hc:i:nprs:t:u:w:" opt; do
     case "$opt" in
         h) usage ;;
         c) charmap "$OPTARG" ;;
         i) import "$OPTARG" ;;
         n) NMBD="true" ;;
         p) PERMISSIONS="true" ;;
+        r) recycle ;;
         s) eval share $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
         t) timezone "$OPTARG" ;;
         u) eval user $(sed 's|;| |g' <<< $OPTARG) ;;
@@ -190,9 +200,10 @@ done
 shift $(( OPTIND - 1 ))
 
 [[ "${CHARMAP:-""}" ]] && charmap "$CHARMAP"
+[[ "${PERMISSIONS:-""}" ]] && perms
+[[ "${RECYCLE:-""}" ]] && recycle
 [[ "${TZ:-""}" ]] && timezone "$TZ"
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
-[[ "${PERMISSIONS:-""}" ]] && perms
 
 if [[ $# -ge 1 && -x $(which $1 2>&-) ]]; then
     exec "$@"
