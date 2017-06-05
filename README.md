@@ -38,7 +38,7 @@ OR set local storage:
         -p          Set ownership and permissions on the shares
         -r          Disable recycle bin for shares
         -s "<name;/path>[;browse;readonly;guest;users;admins;wl]" Config a share
-                    required arg: "<name>;<comment>;</path>"
+                    required arg: "<name>;</path>"
                     <name> is how it's called for clients
                     <path> path to share
                     NOTE: for the default values, just leave blank
