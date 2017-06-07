@@ -32,8 +32,6 @@ RUN export DEBIAN_FRONTEND='noninteractive' && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 COPY samba.sh /usr/bin/
 
-VOLUME ["/etc/samba"]
-
 EXPOSE 137/udp 138/udp 139 445
 
 ENTRYPOINT ["samba.sh"]
