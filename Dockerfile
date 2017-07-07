@@ -27,6 +27,7 @@ RUN export DEBIAN_FRONTEND='noninteractive' && \
     echo '   vfs objects = recycle' >>/etc/samba/smb.conf && \
     echo '   recycle:keeptree = yes' >>/etc/samba/smb.conf && \
     echo '   recycle:versions = yes' >>/etc/samba/smb.conf && \
+    echo '   min protocol = SMB2' >>/etc/samba/smb.conf && \
     echo '' >>/etc/samba/smb.conf && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
