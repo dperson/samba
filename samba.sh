@@ -97,6 +97,14 @@ share() { local share="$1" path="$2" browsable=${3:-yes} ro=${4:-yes} \
     echo "" >>$file
 }
 
+### smb: disable SMB2 minimun
+# Arguments:
+#   none)
+# Return: result
+smb() { local file=/etc/samba/smb.conf
+    sed -i '/min protocol/d' $file
+}
+
 ### timezone: Set the timezone for the container
 # Arguments:
 #   timezone) for example EST5EDT
@@ -150,6 +158,7 @@ Options (fields in '[]' are optional, '<>' are required):
     -n          Start the 'nmbd' daemon to advertise the shares
     -p          Set ownership and permissions on the shares
     -r          Disable recycle bin for shares
+    -S          Disable SMB2 minimun version
     -s \"<name;/path>[;browse;readonly;guest;users;admins;wl]\" Config a share
                 required arg: \"<name>;</path>\"
                 <name> is how it's called for clients
@@ -181,7 +190,7 @@ The 'command' (if provided and valid) will be run instead of samba
 [[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
 [[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o users
 
-while getopts ":hc:i:nprs:t:u:w:" opt; do
+while getopts ":hc:i:nprs:St:u:w:" opt; do
     case "$opt" in
         h) usage ;;
         c) charmap "$OPTARG" ;;
@@ -190,6 +199,7 @@ while getopts ":hc:i:nprs:t:u:w:" opt; do
         p) PERMISSIONS="true" ;;
         r) recycle ;;
         s) eval share $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
+        S) smb ;;
         t) timezone "$OPTARG" ;;
         u) eval user $(sed 's|;| |g' <<< $OPTARG) ;;
         w) workgroup "$OPTARG" ;;
@@ -203,6 +213,7 @@ shift $(( OPTIND - 1 ))
 [[ "${PERMISSIONS:-""}" ]] && perms
 [[ "${RECYCLE:-""}" ]] && recycle
 [[ "${TZ:-""}" ]] && timezone "$TZ"
+[[ "${SMB:-""}" ]] && smb
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
 
 if [[ $# -ge 1 && -x $(which $1 2>&-) ]]; then

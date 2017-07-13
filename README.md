@@ -37,6 +37,7 @@ OR set local storage:
         -n          Start the 'nmbd' daemon to advertise the shares
         -p          Set ownership and permissions on the shares
         -r          Disable recycle bin for shares
+        -S          Disable SMB2 minimun version
         -s "<name;/path>[;browse;readonly;guest;users;admins;wl]" Config a share
                     required arg: "<name>;</path>"
                     <name> is how it's called for clients
@@ -66,6 +67,7 @@ ENVIRONMENT VARIABLES (only available with `docker run`)
 
  * `CHARMAP` - As above, configure character mapping
  * `NMBD` - As above, enable nmbd
+ * `SMB` - As above, disabel SMB2 minimun version
  * `TZ` - As above, set a zoneinfo timezone, IE `EST5EDT`
  * `WORKGROUP` - As above, set workgroup
  * `USERID` - Set the UID for the samba server
