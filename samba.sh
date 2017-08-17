@@ -148,7 +148,7 @@ workgroup() { local workgroup="${1}" file=/etc/samba/smb.conf
 #   none)
 # Return: result
 widelinks() { local file=/etc/samba/smb.conf \
-                    replace='\1\n   wide links = yes\n   unix extensions = no'
+            replace='\1\n   wide links = yes\n   unix extensions = no'
     sed -i 's/\(follow symlinks = yes\)/'"$replace"'/' $file
 }
 
