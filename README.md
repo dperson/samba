@@ -60,6 +60,7 @@ OR set local storage:
         -w "<workgroup>"       Configure the workgroup (domain) samba should use
                     required arg: "<workgroup>"
                     <workgroup> for samba
+        -W          Allow access wide symbolic links
 
     The 'command' (if provided and valid) will be run instead of samba
 
@@ -69,6 +70,7 @@ ENVIRONMENT VARIABLES (only available with `docker run`)
  * `NMBD` - As above, enable nmbd
  * `SMB` - As above, disabel SMB2 minimun version
  * `TZ` - As above, set a zoneinfo timezone, IE `EST5EDT`
+ * `WIDELINKS` - As above, allow access wide symbolic links
  * `WORKGROUP` - As above, set workgroup
  * `USERID` - Set the UID for the samba server
  * `GROUPID` - Set the GID for the samba server

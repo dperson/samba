@@ -143,6 +143,15 @@ workgroup() { local workgroup="${1}" file=/etc/samba/smb.conf
     sed -i 's|^\( *workgroup = \).*|\1'"$workgroup"'|' $file
 }
 
+### widelinks: allow access wide symbolic links
+# Arguments:
+#   none)
+# Return: result
+widelinks() { local file=/etc/samba/smb.conf \
+            replace='\1\n   wide links = yes\n   unix extensions = no'
+    sed -i 's/\(follow symlinks = yes\)/'"$replace"'/' $file
+}
+
 ### usage: Help
 # Arguments:
 #   none)
@@ -181,6 +190,7 @@ Options (fields in '[]' are optional, '<>' are required):
     -w \"<workgroup>\"       Configure the workgroup (domain) samba should use
                 required arg: \"<workgroup>\"
                 <workgroup> for samba
+    -W          Allow access wide symbolic links
 
 The 'command' (if provided and valid) will be run instead of samba
 " >&2
@@ -190,7 +200,7 @@ The 'command' (if provided and valid) will be run instead of samba
 [[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
 [[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o users
 
-while getopts ":hc:i:nprs:St:u:w:" opt; do
+while getopts ":hc:i:nprs:St:u:Ww:" opt; do
     case "$opt" in
         h) usage ;;
         c) charmap "$OPTARG" ;;
@@ -203,6 +213,7 @@ while getopts ":hc:i:nprs:St:u:w:" opt; do
         t) timezone "$OPTARG" ;;
         u) eval user $(sed 's|;| |g' <<< $OPTARG) ;;
         w) workgroup "$OPTARG" ;;
+        W) widelinks ;;
         "?") echo "Unknown option: -$OPTARG"; usage 1 ;;
         ":") echo "No argument value for option: -$OPTARG"; usage 2 ;;
     esac
@@ -215,6 +226,7 @@ shift $(( OPTIND - 1 ))
 [[ "${TZ:-""}" ]] && timezone "$TZ"
 [[ "${SMB:-""}" ]] && smb
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
+[[ "${WIDELINKS:-""}" ]] && widelinks
 
 if [[ $# -ge 1 && -x $(which $1 2>&-) ]]; then
     exec "$@"
