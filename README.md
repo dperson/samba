@@ -68,7 +68,7 @@ ENVIRONMENT VARIABLES (only available with `docker run`)
 
  * `CHARMAP` - As above, configure character mapping
  * `NMBD` - As above, enable nmbd
- * `SMB` - As above, disabel SMB2 minimun version
+ * `SMB` - As above, disable SMB2 minimun version
  * `TZ` - As above, set a zoneinfo timezone, IE `EST5EDT`
  * `WIDELINKS` - As above, allow access wide symbolic links
  * `WORKGROUP` - As above, set workgroup
