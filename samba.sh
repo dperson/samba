@@ -198,7 +198,7 @@ The 'command' (if provided and valid) will be run instead of samba
 }
 
 [[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
-[[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o users
+[[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o smbuser
 
 while getopts ":hc:i:nprs:St:u:Ww:" opt; do
     case "$opt" in
