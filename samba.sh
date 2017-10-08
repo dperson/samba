@@ -97,7 +97,7 @@ share() { local share="$1" path="$2" browsable=${3:-yes} ro=${4:-yes} \
     echo "" >>$file
 }
 
-### smb: disable SMB2 minimun
+### smb: disable SMB2 minimum
 # Arguments:
 #   none)
 # Return: result
@@ -167,7 +167,7 @@ Options (fields in '[]' are optional, '<>' are required):
     -n          Start the 'nmbd' daemon to advertise the shares
     -p          Set ownership and permissions on the shares
     -r          Disable recycle bin for shares
-    -S          Disable SMB2 minimun version
+    -S          Disable SMB2 minimum version
     -s \"<name;/path>[;browse;readonly;guest;users;admins;wl]\" Config a share
                 required arg: \"<name>;</path>\"
                 <name> is how it's called for clients
