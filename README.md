@@ -32,6 +32,8 @@ OR set local storage:
         -h          This help
         -c "<from:to>" setup character mapping for file/directory names
                     required arg: "<from:to>" character mappings separated by ','
+        -g "<parameter>" Provide global option for smb.conf
+                    required arg: "<parameter>" - IE: -g "log level = 2"
         -i "<path>" Import smbpassword
                     required arg: "<path>" - full file path in container
         -n          Start the 'nmbd' daemon to advertise the shares

@@ -33,6 +33,18 @@ charmap() { local chars="$1" file=/etc/samba/smb.conf
     sed -i '/catia:mappings/s/ =.*/ = '"$chars" $file
 }
 
+### global: set a global config option
+# Arguments:
+#   option) raw option
+# Return: line added to smb.conf (replaces existing line with same key)
+global() { local key="${1%%=*}" value="${1##*=}" file=/etc/samba/smb.conf
+    if grep -qE '^\s*'"$key" "$file"; then
+        sed -i 's|^\s*'"$key"'.*|   '"$key = $value"'|' "$file"
+    else
+        sed -i '/\[global\]/a \   '"$key = $value" "$file"
+    fi
+}
+
 ### import: import a smbpasswd file
 # Arguments:
 #   file) file to import
@@ -162,6 +174,8 @@ Options (fields in '[]' are optional, '<>' are required):
     -h          This help
     -c \"<from:to>\" setup character mapping for file/directory names
                 required arg: \"<from:to>\" character mappings separated by ','
+    -g \"<parameter>\" Provide global option for smb.conf
+                    required arg: \"<parameter>\" - IE: -g \"log level = 2\"
     -i \"<path>\" Import smbpassword
                 required arg: \"<path>\" - full file path in container
     -n          Start the 'nmbd' daemon to advertise the shares
@@ -200,10 +214,11 @@ The 'command' (if provided and valid) will be run instead of samba
 [[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
 [[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o users
 
-while getopts ":hc:i:nprs:St:u:Ww:" opt; do
+while getopts ":hc:g:i:nprs:St:u:Ww:" opt; do
     case "$opt" in
         h) usage ;;
         c) charmap "$OPTARG" ;;
+        g) global "$OPTARG" ;;
         i) import "$OPTARG" ;;
         n) NMBD="true" ;;
         p) PERMISSIONS="true" ;;
