@@ -51,7 +51,7 @@ global() { local key="${1%%=*}" value="${1#*=}" file=/etc/samba/smb.conf
 # Return: user(s) added to container
 import() { local name id file="$1"
     while read name id; do
-        useradd "$name" -M -u "$id"
+        adduser -D -H -u "$id" "$name"
     done < <(cut -d: -f1,2 --output-delimiter=' ' $file)
     pdbedit -i smbpasswd:$file
 }
@@ -117,23 +117,6 @@ smb() { local file=/etc/samba/smb.conf
     sed -i '/min protocol/d' $file
 }
 
-### timezone: Set the timezone for the container
-# Arguments:
-#   timezone) for example EST5EDT
-# Return: the correct zoneinfo file will be symlinked into place
-timezone() { local timezone="${1:-EST5EDT}"
-    [[ -e /usr/share/zoneinfo/$timezone ]] || {
-        echo "ERROR: invalid timezone specified: $timezone" >&2
-        return
-    }
-
-    if [[ -w /etc/timezone && $(cat /etc/timezone) != $timezone ]]; then
-        echo "$timezone" >/etc/timezone
-        ln -sf /usr/share/zoneinfo/$timezone /etc/localtime
-        dpkg-reconfigure -f noninteractive tzdata >/dev/null 2>&1
-    fi
-}
-
 ### user: add a user
 # Arguments:
 #   name) for user
@@ -142,8 +125,8 @@ timezone() { local timezone="${1:-EST5EDT}"
 #   group) for user
 # Return: user added to container
 user() { local name="${1}" passwd="${2}" id="${3:-""}" group="${4:-""}"
-    [[ "$group" ]] && { grep -q "^$group:" /etc/group || groupadd "$group"; }
-    useradd "$name" -M ${id:+-u $id} ${group:+-g $group}
+    [[ "$group" ]] && { grep -q "^$group:" /etc/group || addgroup "$group"; }
+    adduser -D -H ${group:+-G $group} ${id:+-u $id} "$name"
     echo -e "$passwd\n$passwd" | smbpasswd -s -a "$name"
 }
 
@@ -193,8 +176,6 @@ Options (fields in '[]' are optional, '<>' are required):
                 [users] allowed default:'all' or list of allowed users
                 [admins] allowed default:'none' or list of admin users
                 [writelist] list of users that can write to a RO share
-    -t \"\"       Configure timezone
-                possible arg: \"[timezone]\" - zoneinfo timezone for container
     -u \"<username;password>[;ID;group]\"       Add a user
                 required arg: \"<username>;<passwd>\"
                 <username> for user
@@ -214,7 +195,7 @@ The 'command' (if provided and valid) will be run instead of samba
 [[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
 [[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o smbuser
 
-while getopts ":hc:g:i:nprs:St:u:Ww:" opt; do
+while getopts ":hc:g:i:nprs:Su:Ww:" opt; do
     case "$opt" in
         h) usage ;;
         c) charmap "$OPTARG" ;;
@@ -223,9 +204,8 @@ while getopts ":hc:g:i:nprs:St:u:Ww:" opt; do
         n) NMBD="true" ;;
         p) PERMISSIONS="true" ;;
         r) recycle ;;
-        s) eval share $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
+        s) eval share $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $OPTARG) ;;
         S) smb ;;
-        t) timezone "$OPTARG" ;;
         u) eval user $(sed 's|;| |g' <<< $OPTARG) ;;
         w) workgroup "$OPTARG" ;;
         W) widelinks ;;
@@ -238,7 +218,6 @@ shift $(( OPTIND - 1 ))
 [[ "${CHARMAP:-""}" ]] && charmap "$CHARMAP"
 [[ "${PERMISSIONS:-""}" ]] && perms
 [[ "${RECYCLE:-""}" ]] && recycle
-[[ "${TZ:-""}" ]] && timezone "$TZ"
 [[ "${SMB:-""}" ]] && smb
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
 [[ "${WIDELINKS:-""}" ]] && widelinks

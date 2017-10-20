@@ -1,17 +1,19 @@
-FROM resin/armv7hf-debian:stretch
+FROM resin/armhf-alpine
 MAINTAINER David Personette <dperson@gmail.com>
 
 # Install samba
 RUN ["cross-build-start"]
-RUN export DEBIAN_FRONTEND='noninteractive' && \
-    apt-get update -qq && \
-    apt-get install -qqy --no-install-recommends procps samba samba-vfs-modules\
-                $(apt-get -s dist-upgrade|awk '/^Inst.*ecurity/ {print $2}') &&\
-    useradd -c 'Samba User' -d /tmp -M -r smbuser && \
+RUN apk --no-cache add bash samba shadow && \
+    adduser -D -G users -H -g 'Samba User' -h /tmp smbuser && \
     sed -i 's|^\(   log file = \).*|\1/dev/stdout|' /etc/samba/smb.conf && \
+    sed -i 's|^\(   load printers = \).*|\1no|' /etc/samba/smb.conf && \
+    sed -i 's|^\(   printcap name = \).*|\1/dev/null|' /etc/samba/smb.conf && \
+    sed -i 's|^;*\(   printing = \).*|\1bsd|' /etc/samba/smb.conf && \
     sed -i 's|^\(   unix password sync = \).*|\1no|' /etc/samba/smb.conf && \
     sed -i '/Share Definitions/,$d' /etc/samba/smb.conf && \
-    echo '   security = user' >>/etc/samba/smb.conf && \
+    echo '   pam password change = yes' >>/etc/samba/smb.conf && \
+    echo '   map to guest = bad user' >>/etc/samba/smb.conf && \
+    echo '   usershare allow guests = yes' >>/etc/samba/smb.conf && \
     echo '   create mask = 0664' >>/etc/samba/smb.conf && \
     echo '   force create mode = 0664' >>/etc/samba/smb.conf && \
     echo '   directory mask = 0775' >>/etc/samba/smb.conf && \
@@ -30,13 +32,16 @@ RUN export DEBIAN_FRONTEND='noninteractive' && \
     echo '   recycle:versions = yes' >>/etc/samba/smb.conf && \
     echo '   min protocol = SMB2' >>/etc/samba/smb.conf && \
     echo '' >>/etc/samba/smb.conf && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/*
+    rm -rf /tmp/*
 RUN ["cross-build-end"]
+
 COPY samba.sh /usr/bin/
 
-VOLUME ["/etc/samba"]
+HEALTHCHECK --interval=60s --timeout=15s \
+             CMD smbclient -L '\\localhost\' -U 'guest%' -m SMB3
 
 EXPOSE 137/udp 138/udp 139 445
+
+VOLUME ["/etc/samba"]
 
 ENTRYPOINT ["samba.sh"]

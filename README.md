@@ -51,8 +51,6 @@ OR set local storage:
                     [users] allowed default:'all' or list of allowed users
                     [admins] allowed default:'none' or list of admin users
                     [writelist] list of users that can write to a RO share
-        -t ""       Configure timezone
-                    possible arg: "[timezone]" - zoneinfo timezone for container
         -u "<username;password>[;ID;group]"       Add a user
                     required arg: "<username>;<passwd>"
                     <username> for user
@@ -71,7 +69,7 @@ ENVIRONMENT VARIABLES (only available with `docker run`)
  * `CHARMAP` - As above, configure character mapping
  * `NMBD` - As above, enable nmbd
  * `SMB` - As above, disable SMB2 minimum version
- * `TZ` - As above, set a zoneinfo timezone, IE `EST5EDT`
+ * `TZ` - Set a timezone, IE `EST5EDT`
  * `WIDELINKS` - As above, allow access wide symbolic links
  * `WORKGROUP` - As above, set workgroup
  * `USERID` - Set the UID for the samba server
@@ -87,17 +85,7 @@ Any of the commands can be run at creation with `docker run` or later with
 
 ### Setting the Timezone
 
-    sudo docker run -it -p 139:139 -p 445:445 -d dperson/samba -t EST5EDT
-
-OR using `environment variables`
-
     sudo docker run -it -e TZ=EST5EDT -p 139:139 -p 445:445 -d dperson/samba
-
-Will get you the same settings as
-
-    sudo docker run -it --name samba -p 139:139 -p 445:445 -d dperson/samba
-    sudo docker exec -it samba samba.sh -t EST5EDT ls -AlF /etc/localtime
-    sudo docker restart samba
 
 ### Start an instance creating users and shares:
 
