@@ -38,10 +38,10 @@ charmap() { local chars="$1" file=/etc/samba/smb.conf
 #   option) raw option
 # Return: line added to smb.conf (replaces existing line with same key)
 global() { local key="${1%%=*}" value="${1#*=}" file=/etc/samba/smb.conf
-    if grep -qE '^\s*'"$key" "$file"; then
-        sed -i 's|^\s*'"$key"'.*|   '"$key = $value"'|' "$file"
+    if grep -qE '^;*\s*'"$key" "$file"; then
+        sed -i 's|^;*\s*'"$key"'.*|   '"${key% } = ${value# }"'|' "$file"
     else
-        sed -i '/\[global\]/a \   '"$key = $value" "$file"
+        sed -i '/\[global\]/a \   '"${key% } = ${value# }" "$file"
     fi
 }
 
