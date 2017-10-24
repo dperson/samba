@@ -52,7 +52,7 @@ global() { local key="${1%%=*}" value="${1#*=}" file=/etc/samba/smb.conf
 import() { local name id file="$1"
     while read name id; do
         adduser -D -H -u "$id" "$name"
-    done < <(cut -d: -f1,2 --output-delimiter=' ' $file)
+    done < <(cut -d: -f1,2 $file | sed 's/:/ /')
     pdbedit -i smbpasswd:$file
 }
 
