@@ -2,7 +2,8 @@ FROM alpine
 MAINTAINER David Personette <dperson@gmail.com>
 
 # Install samba
-RUN apk --no-cache --no-progress add bash samba shadow && \
+RUN apk --no-cache --no-progress upgrade && \
+    apk --no-cache --no-progress add bash samba shadow && \
     adduser -D -G users -H -g 'Samba User' -h /tmp smbuser && \
     file="/etc/samba/smb.conf" && \
     sed -i 's|^;* *\(log file = \).*|   \1/dev/stdout|' $file && \
