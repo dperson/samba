@@ -126,7 +126,7 @@ smb() { local file=/etc/samba/smb.conf
 # Return: user added to container
 user() { local name="${1}" passwd="${2}" id="${3:-""}" group="${4:-""}"
     [[ "$group" ]] && { grep -q "^$group:" /etc/group || addgroup "$group"; }
-    grep -q "^$user:" /etc/passwd ||
+    grep -q "^$name:" /etc/passwd ||
         adduser -D -H ${group:+-G $group} ${id:+-u $id} "$name"
     echo -e "$passwd\n$passwd" | smbpasswd -s -a "$name"
 }
