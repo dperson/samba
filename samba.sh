@@ -51,7 +51,7 @@ global() { local key="${1%%=*}" value="${1#*=}" file=/etc/samba/smb.conf
 # Return: user(s) added to container
 import() { local name id file="$1"
     while read name id; do
-        grep -q "^$user:" /etc/passwd || adduser -D -H -u "$id" "$name"
+        grep -q "^$name:" /etc/passwd || adduser -D -H -u "$id" "$name"
     done < <(cut -d: -f1,2 $file | sed 's/:/ /')
     pdbedit -i smbpasswd:$file
 }
