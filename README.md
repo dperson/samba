@@ -40,7 +40,8 @@ OR set local storage:
         -p          Set ownership and permissions on the shares
         -r          Disable recycle bin for shares
         -S          Disable SMB2 minimum version
-        -s "<name;/path>[;browse;readonly;guest;users;admins;wl]" Config a share
+        -s "<name;/path>[;browse;readonly;guest;users;admins;writelist;comment]"
+                    Configure a share
                     required arg: "<name>;</path>"
                     <name> is how it's called for clients
                     <path> path to share
@@ -51,6 +52,7 @@ OR set local storage:
                     [users] allowed default:'all' or list of allowed users
                     [admins] allowed default:'none' or list of admin users
                     [writelist] list of users that can write to a RO share
+                    [comment] description of share
         -u "<username;password>[;ID;group]"       Add a user
                     required arg: "<username>;<passwd>"
                     <username> for user
@@ -67,9 +69,15 @@ OR set local storage:
 ENVIRONMENT VARIABLES (only available with `docker run`)
 
  * `CHARMAP` - As above, configure character mapping
+ * `GLOBAL` - As above, configure a global option
+ * `IMPORT` - As above, import a smbpassword file
  * `NMBD` - As above, enable nmbd
+ * `PERMISSIONS` - As above, set file permissions on all shares
+ * `RECYCLE` - As above, disable recycle bin
+ * `SHARE` - As above, setup a share
  * `SMB` - As above, disable SMB2 minimum version
  * `TZ` - Set a timezone, IE `EST5EDT`
+ * `USER` - As above, setup a user
  * `WIDELINKS` - As above, allow access wide symbolic links
  * `WORKGROUP` - As above, set workgroup
  * `USERID` - Set the UID for the samba server

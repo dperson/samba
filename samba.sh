@@ -86,10 +86,11 @@ recycle() { local file=/etc/samba/smb.conf
 #   users) list of allowed users
 #   admins) list of admin users
 #   writelist) list of users that can write to a RO share
+#   comment) description of share
 # Return: result
 share() { local share="$1" path="$2" browsable=${3:-yes} ro=${4:-yes} \
                 guest=${5:-yes} users=${6:-""} admins=${7:-""} \
-                writelist=${8:-""} file=/etc/samba/smb.conf
+                writelist=${8:-""} comment=${9:-""} file=/etc/samba/smb.conf
     sed -i "/\\[$share\\]/,/^\$/d" $file
     echo "[$share]" >>$file
     echo "   path = $path" >>$file
@@ -106,6 +107,8 @@ share() { local share="$1" path="$2" browsable=${3:-yes} ro=${4:-yes} \
         echo "   admin users = $(tr ',' ' ' <<< $admins)" >>$file
     [[ ${writelist:-""} && ! ${writelist:-""} =~ none ]] &&
         echo "   write list = $(tr ',' ' ' <<< $writelist)" >>$file
+    [[ ${comment:-""} && ! ${comment:-""} =~ none ]] &&
+        echo "   comment = $(tr ',' ' ' <<< $comment)" >>$file
     echo "" >>$file
 }
 
@@ -166,7 +169,8 @@ Options (fields in '[]' are optional, '<>' are required):
     -p          Set ownership and permissions on the shares
     -r          Disable recycle bin for shares
     -S          Disable SMB2 minimum version
-    -s \"<name;/path>[;browse;readonly;guest;users;admins;wl]\" Config a share
+    -s \"<name;/path>[;browse;readonly;guest;users;admins;writelist;comment]\"
+                Configure a share
                 required arg: \"<name>;</path>\"
                 <name> is how it's called for clients
                 <path> path to share
@@ -177,6 +181,7 @@ Options (fields in '[]' are optional, '<>' are required):
                 [users] allowed default:'all' or list of allowed users
                 [admins] allowed default:'none' or list of admin users
                 [writelist] list of users that can write to a RO share
+                [comment] description of share
     -u \"<username;password>[;ID;group]\"       Add a user
                 required arg: \"<username>;<passwd>\"
                 <username> for user
@@ -207,7 +212,7 @@ while getopts ":hc:g:i:nprs:Su:Ww:" opt; do
         r) recycle ;;
         s) eval share $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $OPTARG) ;;
         S) smb ;;
-        u) eval user $(sed 's|;| |g' <<< $OPTARG) ;;
+        u) eval user $(sed 's/;/ /g' <<< $OPTARG) ;;
         w) workgroup "$OPTARG" ;;
         W) widelinks ;;
         "?") echo "Unknown option: -$OPTARG"; usage 1 ;;
@@ -217,9 +222,13 @@ done
 shift $(( OPTIND - 1 ))
 
 [[ "${CHARMAP:-""}" ]] && charmap "$CHARMAP"
+[[ "${GLOBAL:-""}" ]] && global "$GLOBAL"
+[[ "${IMPORT:-""}" ]] && import "$IMPORT"
 [[ "${PERMISSIONS:-""}" ]] && perms
 [[ "${RECYCLE:-""}" ]] && recycle
+[[ "${SHARE:-""}" ]] && share $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $SHARE)
 [[ "${SMB:-""}" ]] && smb
+[[ "${USER:-""}" ]] && user $(sed 's/;/ /g' <<< $USER)
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
 [[ "${WIDELINKS:-""}" ]] && widelinks
 
