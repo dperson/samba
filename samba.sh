@@ -110,6 +110,7 @@ share() { local share="$1" path="$2" browsable=${3:-yes} ro=${4:-yes} \
     [[ ${comment:-""} && ! ${comment:-""} =~ none ]] &&
         echo "   comment = $(tr ',' ' ' <<< $comment)" >>$file
     echo "" >>$file
+    [[ -d $path ]] || mkdir -p $path
 }
 
 ### smb: disable SMB2 minimum
