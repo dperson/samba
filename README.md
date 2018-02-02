@@ -89,7 +89,7 @@ will also want to expose port 137 and 138 with `-p 137:137/udp -p 138:138/udp`.
 ## Examples
 
 Any of the commands can be run at creation with `docker run` or later with
-`docker exec -it samba.sh` (as of version 1.3 of docker).
+`docker exec -it samba samba.sh` (as of version 1.3 of docker).
 
 ### Setting the Timezone
 
