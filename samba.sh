@@ -88,9 +88,9 @@ recycle() { local file=/etc/samba/smb.conf
 #   writelist) list of users that can write to a RO share
 #   comment) description of share
 # Return: result
-share() { local share="$1" path="$2" browsable=${3:-yes} ro=${4:-yes} \
-                guest=${5:-yes} users=${6:-""} admins=${7:-""} \
-                writelist=${8:-""} comment=${9:-""} file=/etc/samba/smb.conf
+share() { local share="$1" path="$2" browsable="${3:-yes}" ro="${4:-yes}" \
+                guest="${5:-yes}" users="${6:-""}" admins="${7:-""}" \
+                writelist="${8:-""}" comment="${9:-""}" file=/etc/samba/smb.conf
     sed -i "/\\[$share\\]/,/^\$/d" $file
     echo "[$share]" >>$file
     echo "   path = $path" >>$file
@@ -156,7 +156,7 @@ widelinks() { local file=/etc/samba/smb.conf \
 # Arguments:
 #   none)
 # Return: Help text
-usage() { local RC=${1:-0}
+usage() { local RC="${1:-0}"
     echo "Usage: ${0##*/} [-opt] [command]
 Options (fields in '[]' are optional, '<>' are required):
     -h          This help
@@ -227,7 +227,7 @@ shift $(( OPTIND - 1 ))
 [[ "${IMPORT:-""}" ]] && import "$IMPORT"
 [[ "${PERMISSIONS:-""}" ]] && perms
 [[ "${RECYCLE:-""}" ]] && recycle
-[[ "${SHARE:-""}" ]] && share $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $SHARE)
+[[ "${SHARE:-""}" ]] && eval share $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $SHARE)
 [[ "${SMB:-""}" ]] && smb
 [[ "${USER:-""}" ]] && user $(sed 's/;/ /g' <<< $USER)
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
