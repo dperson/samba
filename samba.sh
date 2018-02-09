@@ -49,7 +49,7 @@ global() { local key="${1%%=*}" value="${1#*=}" file=/etc/samba/smb.conf
 # Arguments:
 #   file) file to import
 # Return: user(s) added to container
-import() { local name id file="$1"
+import() { local file="$1" name id
     while read name id; do
         grep -q "^$name:" /etc/passwd || adduser -D -H -u "$id" "$name"
     done < <(cut -d: -f1,2 $file | sed 's/:/ /')
@@ -128,7 +128,7 @@ smb() { local file=/etc/samba/smb.conf
 #   id) for user
 #   group) for user
 # Return: user added to container
-user() { local name="${1}" passwd="${2}" id="${3:-""}" group="${4:-""}"
+user() { local name="$1" passwd="$2" id="${3:-""}" group="${4:-""}"
     [[ "$group" ]] && { grep -q "^$group:" /etc/group || addgroup "$group"; }
     grep -q "^$name:" /etc/passwd ||
         adduser -D -H ${group:+-G $group} ${id:+-u $id} "$name"
@@ -139,7 +139,7 @@ user() { local name="${1}" passwd="${2}" id="${3:-""}" group="${4:-""}"
 # Arguments:
 #   workgroup) the name to set
 # Return: configure the correct workgroup
-workgroup() { local workgroup="${1}" file=/etc/samba/smb.conf
+workgroup() { local workgroup="$1" file=/etc/samba/smb.conf
     sed -i 's|^\( *workgroup = \).*|\1'"$workgroup"'|' $file
 }
 
@@ -213,7 +213,7 @@ while getopts ":hc:g:i:nprs:Su:Ww:" opt; do
         r) recycle ;;
         s) eval share $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $OPTARG) ;;
         S) smb ;;
-        u) eval user $(sed 's/;/ /g' <<< $OPTARG) ;;
+        u) eval user $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $OPTARG) ;;
         w) workgroup "$OPTARG" ;;
         W) widelinks ;;
         "?") echo "Unknown option: -$OPTARG"; usage 1 ;;
@@ -229,7 +229,7 @@ shift $(( OPTIND - 1 ))
 [[ "${RECYCLE:-""}" ]] && recycle
 [[ "${SHARE:-""}" ]] && eval share $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $SHARE)
 [[ "${SMB:-""}" ]] && smb
-[[ "${USER:-""}" ]] && user $(sed 's/;/ /g' <<< $USER)
+[[ "${USER:-""}" ]] && eval user $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $USER)
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
 [[ "${WIDELINKS:-""}" ]] && widelinks
 
