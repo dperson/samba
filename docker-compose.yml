@@ -1,0 +1,21 @@
+version: '3.4'
+
+services:
+  samba:
+    image: dperson/samba
+    environment:
+      TZ: 'EST5EDT'
+    networks:
+      - default
+    read_only: true
+    tmpfs:
+      - /tmp
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    volumes:
+      - /mnt:/mnt:z
+    command: '-s "Mount;/mnt"'
+
+networks:
+  default:
