@@ -32,10 +32,27 @@ RUN apk --no-cache --no-progress upgrade && \
     echo '   disable spoolss = yes' >>$file && \
     echo '   socket options = TCP_NODELAY' >>$file && \
     echo '   strict locking = no' >>$file && \
-    echo '   vfs objects = recycle' >>$file && \
+    echo '   vfs objects = acl_xattr fruit recycle' >>$file && \
     echo '   recycle:keeptree = yes' >>$file && \
     echo '   recycle:versions = yes' >>$file && \
-    echo '   min protocol = SMB2' >>$file && \
+    echo '' >>$file && \
+    echo '   # Security' >>$file && \
+    echo '   client ipc max protocol = default' >>$file && \
+    echo '   client max protocol = default' >>$file && \
+    echo '   server max protocol = SMB3' >>$file && \
+    echo '   client ipc min protocol = default' >>$file && \
+    echo '   client min protocol = CORE' >>$file && \
+    echo '   server min protocol = SMB2' >>$file && \
+    echo '' >>$file && \
+    echo '   # Time Machine' >>$file && \
+    echo '   durable handles = yes' >>$file && \
+    echo '   kernel oplocks = no' >>$file && \
+    echo '   kernel share modes = no' >>$file && \
+    echo '   posix locking = no' >>$file && \
+    echo '   fruit:aapl = yes' >>$file && \
+    echo '   fruit:advertise_fullsync = true' >>$file && \
+    echo '   fruit:time machine = yes' >>$file && \
+    echo '   smb2 leases = yes' >>$file && \
     echo '' >>$file && \
     rm -rf /tmp/*
 RUN ["cross-build-end"]
