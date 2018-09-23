@@ -66,7 +66,7 @@ OR set local storage:
 
     The 'command' (if provided and valid) will be run instead of samba
 
-ENVIRONMENT VARIABLES (only available with `docker run`)
+ENVIRONMENT VARIABLES
 
  * `CHARMAP` - As above, configure character mapping
  * `GLOBAL` - As above, configure a global option
