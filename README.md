@@ -90,6 +90,9 @@ ENVIRONMENT VARIABLES
 **NOTE**: if you enable nmbd (via `-n` or the `NMBD` environment variable), you
 will also want to expose port 137 and 138 with `-p 137:137/udp -p 138:138/udp`.
 
+**NOTE2**: there are reports that `-n` and `NMBD` only work if you have the
+container configured to use the hosts network stack.
+
 ## Examples
 
 Any of the commands can be run at creation with `docker run` or later with
