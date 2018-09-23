@@ -45,6 +45,14 @@ global() { local key="${1%%=*}" value="${1#*=}" file=/etc/samba/smb.conf
     fi
 }
 
+### include: add a samba config file include
+# Arguments:
+#   file) file to import
+include() { local includefile="$1" file=/etc/samba/smb.conf
+    sed -i "\\|include = $includefile|d" "$file"
+    echo "include = $includefile" >> "$file"
+}
+
 ### import: import a smbpasswd file
 # Arguments:
 #   file) file to import
@@ -193,6 +201,9 @@ Options (fields in '[]' are optional, '<>' are required):
                 required arg: \"<workgroup>\"
                 <workgroup> for samba
     -W          Allow access wide symbolic links
+    -I          Add an include option at the end of the smb.conf
+                required arg: \"<include file path>\"
+                <include file path> in the container, e.g. a bind mount
 
 The 'command' (if provided and valid) will be run instead of samba
 " >&2
@@ -202,7 +213,7 @@ The 'command' (if provided and valid) will be run instead of samba
 [[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
 [[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o users
 
-while getopts ":hc:g:i:nprs:Su:Ww:" opt; do
+while getopts ":hc:g:i:nprs:Su:Ww:I:" opt; do
     case "$opt" in
         h) usage ;;
         c) charmap "$OPTARG" ;;
@@ -216,6 +227,7 @@ while getopts ":hc:g:i:nprs:Su:Ww:" opt; do
         u) eval user $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $OPTARG) ;;
         w) workgroup "$OPTARG" ;;
         W) widelinks ;;
+        I) include "$OPTARG" ;;
         "?") echo "Unknown option: -$OPTARG"; usage 1 ;;
         ":") echo "No argument value for option: -$OPTARG"; usage 2 ;;
     esac
@@ -232,6 +244,7 @@ shift $(( OPTIND - 1 ))
 [[ "${USER:-""}" ]] && eval user $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $USER)
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
 [[ "${WIDELINKS:-""}" ]] && widelinks
+[[ "${INCLUDE:-""}" ]] && include "$INCLUDE"
 
 if [[ $# -ge 1 && -x $(which $1 2>&-) ]]; then
     exec "$@"
