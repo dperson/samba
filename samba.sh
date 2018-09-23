@@ -101,6 +101,9 @@ share() { local share="$1" path="$2" browsable="${3:-yes}" ro="${4:-yes}" \
     echo -n ".TemporaryItems/.Trashes/desktop.ini/ehthumbs.db/" >>$file
     echo "Network Trash Folder/Temporary Items/Thumbs.db/" >>$file
     echo "   delete veto files = yes" >>$file
+    [[ $share == "homes" ]] &&
+        echo "   force user = %S" >>$file &&
+        echo "   force group = %S" >>$file
     [[ ${users:-""} && ! ${users:-""} =~ all ]] &&
         echo "   valid users = $(tr ',' ' ' <<< $users)" >>$file
     [[ ${admins:-""} && ! ${admins:-""} =~ none ]] &&
