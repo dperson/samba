@@ -1,4 +1,4 @@
-FROM resin/armhf-alpine
+FROM balenalib/armv7hf-alpine
 MAINTAINER David Personette <dperson@gmail.com>
 
 # Install samba

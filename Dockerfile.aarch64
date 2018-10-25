@@ -1,4 +1,4 @@
-FROM resin/aarch64-alpine
+FROM balenalib/aarch64-alpine
 MAINTAINER David Personette <dperson@gmail.com>
 
 # Install samba
