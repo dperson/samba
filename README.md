@@ -109,8 +109,8 @@ Any of the commands can be run at creation with `docker run` or later with
                 -u "example2;badpass" \
                 -s "public;/share" \
                 -s "users;/srv;no;no;no;example1,example2" \
-                -s "example1 private;/example1;no;no;no;example1" \
-                -s "example2 private;/example2;no;no;no;example2"
+                -s "example1 private share;/example1;no;no;no;example1" \
+                -s "example2 private share;/example2;no;no;no;example2"
 
 # User Feedback
 
