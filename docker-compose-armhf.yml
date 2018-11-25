@@ -1,0 +1,26 @@
+version: '2.0'
+
+services:
+  samba:
+    image: dperson/samba:armhf
+    environment:
+      TZ: 'EST5EDT'
+    networks:
+      - default
+    read_only: false 
+    tmpfs:
+      - /tmp
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    ports:
+      - "139:139/tcp"
+      - "137:137/udp"
+      - "138:138/udp"
+      - "445:445/tcp"
+    volumes:
+      - /home/sn/share:/mnt:z
+    command: '-u "sn;447826004" -s "Mount;/mnt;yes;no;no;sn;sn"'
+
+networks:
+  default:
