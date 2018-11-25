@@ -19,8 +19,8 @@ services:
       - "138:138/udp"
       - "445:445/tcp"
     volumes:
-      - /home/sn/share:/mnt:z
-    command: '-u "sn;447826004" -s "Mount;/mnt;yes;no;no;sn;sn"'
+      - /home/pi/share:/mnt:z
+    command: '-u "pi;PaSsW@rD" -s "Mount;/mnt;yes;no;no;pi;pi"'
 
 networks:
   default:
