@@ -2,7 +2,7 @@ FROM balenalib/armv7hf-alpine
 MAINTAINER David Personette <dperson@gmail.com>
 
 # Install samba
-RUN ["cross-build-start"]
+#RUN ["cross-build-start"]
 RUN apk --no-cache --no-progress upgrade && \
     apk --no-cache --no-progress add bash samba shadow tini && \
     adduser -D -G users -H -S -g 'Samba User' -h /tmp smbuser && \
@@ -56,7 +56,7 @@ RUN apk --no-cache --no-progress upgrade && \
     echo '   smb2 leases = yes' >>$file && \
     echo '' >>$file && \
     rm -rf /tmp/*
-RUN ["cross-build-end"]
+#RUN ["cross-build-end"]
 
 COPY samba.sh /usr/bin/
 

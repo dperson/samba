@@ -7,7 +7,7 @@ services:
       TZ: 'EST5EDT'
     networks:
       - default
-    read_only: true
+    read_only: false
     tmpfs:
       - /tmp
     restart: unless-stopped
