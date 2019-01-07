@@ -3,24 +3,66 @@ version: '3.4'
 services:
   samba:
     image: dperson/samba
-    environment:
-      TZ: 'EST5EDT'
-    networks:
-      - default
-    ports:
-      - "137:137/udp"
-      - "138:138/udp"
-      - "139:139/tcp"
-      - "445:445/tcp"
-    read_only: true
-    tmpfs:
-      - /tmp
+    container_name: samba
     restart: unless-stopped
     stdin_open: true
     tty: true
+    environment:
+
+      # timszone, ex: 'America/Toronto'
+      TZ: "America/Toronto"
+
+      # advertise shares, default: true, or false (open ports 137, 138)
+      NMBD: "true"
+
+      # add a single user. If you need more, use command instead of environment
+      # required arg: "<username>;<passwd>"
+      # <username> for user
+      # <password> for user
+      # [ID] for user, default: ""
+      # [group] for user, default: ""
+      USER: "myuser;mypassword"
+
+      # set the UID for the samba share, default: ""
+      USERID: "0"
+
+      # set the GID for the samba share, default: ""
+      GROUPID: "0"
+
+      # add a single share. If you need more, use command instead of environment
+      # required arg: "<name>;</path>"
+      # <share_name>;
+      # <path_to_share>;
+      # [browsable] default:'yes' or 'no';
+      # [read_only] default:'yes' or 'no';
+      # [guest]: default: 'yes' or 'no';
+      # [users]: default: 'all' or list of allowed users;
+      # [admins] default: 'none' or list of admin users;
+      # [writelist] default: 'none' or list of users that can write to read-only share;
+      # [comment] default: 'none' or description of share
+      SHARE: "mysharename;/mnt;yes;no;no;myuser;'none';'none';'my awesome share"
+
+      # workgroup/domain name for share default: "MYGROUP"
+      WORKGROUP: "WORKGROUP"
+
+      # if set, disables recycle bin for shares
+      RECYCLE: ""
+
+      # if set, disables SMB2 minimum version
+      # SMB: ""
+
+    networks:
+      - default
+    ports:
+      - "137:137/udp" # required to advertise shares (NMBD)
+      - "138:138/udp" # required to advertise shares (NMBD)
+      - "139:139/tcp" # default smb port
+      - "445:445/tcp" # default smb port
+    read_only: false
+    tmpfs:
+      - /tmp
     volumes:
-      - /mnt:/mnt:z
-    command: '-s "Mount;/mnt"'
+      - /mnt:/mnt:z # :z allows share to be used by multiple containers
 
 networks:
-  default:
+    default:
