@@ -228,7 +228,7 @@ Options (fields in '[]' are optional, '<>' are required):
                 [admins] allowed default:'none' or list of admin users
                 [writelist] list of users that can write to a RO share
                 [comment] description of share
-                Ex. -m \"media;/192.168.1.143/public/;yes;yes\"
+                Ex. -m \"public;/192.168.1.1/public/;yes;yes\"
     -n          Start the 'nmbd' daemon to advertise the shares
     -p          Set ownership and permissions on the shares
     -r          Disable recycle bin for shares
