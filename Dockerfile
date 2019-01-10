@@ -15,6 +15,7 @@ RUN apk --no-cache --no-progress upgrade && \
     sed -i 's|^;* *\(short preserve case = \).*|   \1yes|' $file && \
     sed -i 's|^;* *\(default case = \).*|   \1lower|' $file && \
     sed -i '/Share Definitions/,$d' $file && \
+    echo '   host msdfs = true' >>$file && \
     echo '   pam password change = yes' >>$file && \
     echo '   map to guest = bad user' >>$file && \
     echo '   usershare allow guests = yes' >>$file && \
