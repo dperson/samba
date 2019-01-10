@@ -121,6 +121,47 @@ share() { local share="$1" path="$2" browsable="${3:-yes}" ro="${4:-yes}" \
     [[ -d $path ]] || mkdir -p $path
 }
 
+
+
+### msdfs: Add share with msdfs support
+# Arguments:
+#   share) share name
+#   path) path to share
+#   browsable) 'yes' or 'no'
+#   readonly) 'yes' or 'no'
+#   guest) 'yes' or 'no'
+#   users) list of allowed users
+#   admins) list of admin users
+#   writelist) list of users that can write to a RO share
+#   comment) description of share
+# Return: result
+msdfs() { local share="$1" path="$2" browsable="${3:-yes}" ro="${4:-yes}" \
+                guest="${5:-yes}" users="${6:-""}" admins="${7:-""}" \
+                writelist="${8:-""}" comment="${9:-""}" file=/etc/samba/smb.conf
+    sed -i "/\\[$share\\]/,/^\$/d" $file
+    echo "[$share]" >>$file
+    echo "   msdfs root = true" >>$file
+    echo "   msdfs proxy = `echo $path | tr '/' '\'` " >>$file
+    echo "   browsable = $browsable" >>$file
+    echo "   read only = $ro" >>$file
+    echo "   guest ok = $guest" >>$file
+    echo -n "   veto files = /._*/.apdisk/.AppleDouble/.DS_Store/" >>$file
+    echo -n ".TemporaryItems/.Trashes/desktop.ini/ehthumbs.db/" >>$file
+    echo "Network Trash Folder/Temporary Items/Thumbs.db/" >>$file
+    echo "   delete veto files = yes" >>$file
+    [[ ${users:-""} && ! ${users:-""} =~ all ]] &&
+        echo "   valid users = $(tr ',' ' ' <<< $users)" >>$file
+    [[ ${admins:-""} && ! ${admins:-""} =~ none ]] &&
+        echo "   admin users = $(tr ',' ' ' <<< $admins)" >>$file
+    [[ ${writelist:-""} && ! ${writelist:-""} =~ none ]] &&
+        echo "   write list = $(tr ',' ' ' <<< $writelist)" >>$file
+    [[ ${comment:-""} && ! ${comment:-""} =~ none ]] &&
+        echo "   comment = $(tr ',' ' ' <<< $comment)" >>$file
+    echo "" >>$file
+    [[ -d $path ]] || mkdir -p $path
+}
+
+
 ### smb: disable SMB2 minimum
 # Arguments:
 #   none)
@@ -174,6 +215,20 @@ Options (fields in '[]' are optional, '<>' are required):
                     required arg: \"<parameter>\" - IE: -g \"log level = 2\"
     -i \"<path>\" Import smbpassword
                 required arg: \"<path>\" - full file path in container
+    -m \"<name;/path>[;browse;readonly;guest;users;admins;writelist;comment]\"
+                Configure a share with msdfs (samba proxy)
+                required arg: \"<name>;</path>\"
+                <name> is how it's called for clients
+                <path> path to share
+                NOTE: for the default value, just leave blank
+                [browsable] default:'yes' or 'no'
+                [readonly] default:'yes' or 'no'
+                [guest] allowed default:'yes' or 'no'
+                [users] allowed default:'all' or list of allowed users
+                [admins] allowed default:'none' or list of admin users
+                [writelist] list of users that can write to a RO share
+                [comment] description of share
+                Ex. -m \"media;/192.168.1.143/public/;yes;yes\"
     -n          Start the 'nmbd' daemon to advertise the shares
     -p          Set ownership and permissions on the shares
     -r          Disable recycle bin for shares
@@ -213,12 +268,13 @@ The 'command' (if provided and valid) will be run instead of samba
 [[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
 [[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o users
 
-while getopts ":hc:g:i:nprs:Su:Ww:I:" opt; do
+while getopts ":hc:g:i:nprs:Sum:Ww:I:" opt; do
     case "$opt" in
         h) usage ;;
         c) charmap "$OPTARG" ;;
         g) global "$OPTARG" ;;
         i) import "$OPTARG" ;;
+        m) eval msdfs $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $OPTARG) ;;
         n) NMBD="true" ;;
         p) PERMISSIONS="true" ;;
         r) recycle ;;
@@ -237,6 +293,7 @@ shift $(( OPTIND - 1 ))
 [[ "${CHARMAP:-""}" ]] && charmap "$CHARMAP"
 [[ "${GLOBAL:-""}" ]] && global "$GLOBAL"
 [[ "${IMPORT:-""}" ]] && import "$IMPORT"
+[[ "${MSDFS:-""}" ]] && eval msdfs $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $MSDFS)
 [[ "${PERMISSIONS:-""}" ]] && perms
 [[ "${RECYCLE:-""}" ]] && recycle
 [[ "${SHARE:-""}" ]] && eval share $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $SHARE)
