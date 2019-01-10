@@ -36,6 +36,20 @@ OR set local storage:
                     required arg: "<parameter>" - IE: -g "log level = 2"
         -i "<path>" Import smbpassword
                     required arg: "<path>" - full file path in container
+        -m "<name;/path>[;browse;readonly;guest;users;admins;writelist;comment]"
+                    Configure a share
+                    required arg: "<name>;</path>"
+                    <name> is how it's called for clients
+                    <path> path to share
+                    NOTE: for the default values, just leave blank
+                    [browsable] default:'yes' or 'no'
+                    [readonly] default:'yes' or 'no'
+                    [guest] allowed default:'yes' or 'no'
+                    [users] allowed default:'all' or list of allowed users
+                    [admins] allowed default:'none' or list of admin users
+                    [writelist] list of users that can write to a RO share
+                    [comment] description of share
+                    Ex. -m \"public;/192.168.1.1/public/;yes;yes\"
         -n          Start the 'nmbd' daemon to advertise the shares
         -p          Set ownership and permissions on the shares
         -r          Disable recycle bin for shares
