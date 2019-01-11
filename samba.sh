@@ -142,21 +142,6 @@ msdfs() { local share="$1" path="$2" browsable="${3:-yes}" ro="${4:-yes}" \
     echo "[$share]" >>$file
     echo "   msdfs root = true" >>$file
     echo "   msdfs proxy = `echo $path | tr '/' '\'` " >>$file
-    echo "   browsable = $browsable" >>$file
-    echo "   read only = $ro" >>$file
-    echo "   guest ok = $guest" >>$file
-    echo -n "   veto files = /._*/.apdisk/.AppleDouble/.DS_Store/" >>$file
-    echo -n ".TemporaryItems/.Trashes/desktop.ini/ehthumbs.db/" >>$file
-    echo "Network Trash Folder/Temporary Items/Thumbs.db/" >>$file
-    echo "   delete veto files = yes" >>$file
-    [[ ${users:-""} && ! ${users:-""} =~ all ]] &&
-        echo "   valid users = $(tr ',' ' ' <<< $users)" >>$file
-    [[ ${admins:-""} && ! ${admins:-""} =~ none ]] &&
-        echo "   admin users = $(tr ',' ' ' <<< $admins)" >>$file
-    [[ ${writelist:-""} && ! ${writelist:-""} =~ none ]] &&
-        echo "   write list = $(tr ',' ' ' <<< $writelist)" >>$file
-    [[ ${comment:-""} && ! ${comment:-""} =~ none ]] &&
-        echo "   comment = $(tr ',' ' ' <<< $comment)" >>$file
     echo "" >>$file
     [[ -d $path ]] || mkdir -p $path
 }
@@ -216,18 +201,10 @@ Options (fields in '[]' are optional, '<>' are required):
     -i \"<path>\" Import smbpassword
                 required arg: \"<path>\" - full file path in container
     -m \"<name;/path>[;browse;readonly;guest;users;admins;writelist;comment]\"
-                Configure a share with msdfs (samba proxy)
+                Configure a msdfs share
                 required arg: \"<name>;</path>\"
                 <name> is how it's called for clients
                 <path> path to share
-                NOTE: for the default value, just leave blank
-                [browsable] default:'yes' or 'no'
-                [readonly] default:'yes' or 'no'
-                [guest] allowed default:'yes' or 'no'
-                [users] allowed default:'all' or list of allowed users
-                [admins] allowed default:'none' or list of admin users
-                [writelist] list of users that can write to a RO share
-                [comment] description of share
                 Ex. -m \"public;/192.168.1.1/public/;yes;yes\"
     -n          Start the 'nmbd' daemon to advertise the shares
     -p          Set ownership and permissions on the shares
