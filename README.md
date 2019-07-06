@@ -53,12 +53,13 @@ OR set local storage:
                     [admins] allowed default:'none' or list of admin users
                     [writelist] list of users that can write to a RO share
                     [comment] description of share
-        -u "<username;password>[;ID;group]"       Add a user
+        -u "<username;password>[;ID;group;GID]"       Add a user
                     required arg: "<username>;<passwd>"
                     <username> for user
                     <password> for user
                     [ID] for user
                     [group] for user
+                    [GID] for group
         -w "<workgroup>"       Configure the workgroup (domain) samba should use
                     required arg: "<workgroup>"
                     <workgroup> for samba

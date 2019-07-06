@@ -135,9 +135,12 @@ smb() { local file=/etc/samba/smb.conf
 #   password) for user
 #   id) for user
 #   group) for user
+#   gid) for group
 # Return: user added to container
-user() { local name="$1" passwd="$2" id="${3:-""}" group="${4:-""}"
-    [[ "$group" ]] && { grep -q "^$group:" /etc/group || addgroup "$group"; }
+user() { local name="$1" passwd="$2" id="${3:-""}" group="${4:-""}" \
+                gid="${5:-""}"
+    [[ "$group" ]] && { grep -q "^$group:" /etc/group ||
+                addgroup ${gid:+--gid $gid }"$group"; }
     grep -q "^$name:" /etc/passwd ||
         adduser -D -H ${group:+-G $group} ${id:+-u $id} "$name"
     echo -e "$passwd\n$passwd" | smbpasswd -s -a "$name"
@@ -191,12 +194,13 @@ Options (fields in '[]' are optional, '<>' are required):
                 [admins] allowed default:'none' or list of admin users
                 [writelist] list of users that can write to a RO share
                 [comment] description of share
-    -u \"<username;password>[;ID;group]\"       Add a user
+    -u \"<username;password>[;ID;group;GID]\"       Add a user
                 required arg: \"<username>;<passwd>\"
                 <username> for user
                 <password> for user
                 [ID] for user
                 [group] for user
+                [GID] for group
     -w \"<workgroup>\"       Configure the workgroup (domain) samba should use
                 required arg: \"<workgroup>\"
                 <workgroup> for samba
@@ -210,7 +214,7 @@ The 'command' (if provided and valid) will be run instead of samba
     exit $RC
 }
 
-[[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
+[[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser&&unset USERID
 [[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o users
 
 while getopts ":hc:g:i:nprs:Su:Ww:I:" opt; do
