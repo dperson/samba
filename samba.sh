@@ -235,13 +235,19 @@ done
 shift $(( OPTIND - 1 ))
 
 [[ "${CHARMAP:-""}" ]] && charmap "$CHARMAP"
-[[ "${GLOBAL:-""}" ]] && global "$GLOBAL"
+while read i; do
+    global "$i"
+done <$(env | awk '/^GLOBAL/ {sub (/^[^=]*=/, "", $0); print}')
 [[ "${IMPORT:-""}" ]] && import "$IMPORT"
 [[ "${PERMISSIONS:-""}" ]] && perms
 [[ "${RECYCLE:-""}" ]] && recycle
-[[ "${SHARE:-""}" ]] && eval share $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $SHARE)
+while read i; do
+    eval share $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $i)
+done <$(env | awk '/^SHARE/ {sub (/^[^=]*=/, "", $0); print}')
 [[ "${SMB:-""}" ]] && smb
-[[ "${USER:-""}" ]] && eval user $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $USER)
+while read i; do
+    eval user $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $i)
+done <$(env | awk '/^USER/ {sub (/^[^=]*=/, "", $0); print}')
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
 [[ "${WIDELINKS:-""}" ]] && widelinks
 [[ "${INCLUDE:-""}" ]] && include "$INCLUDE"
