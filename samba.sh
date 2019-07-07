@@ -190,6 +190,7 @@ Options (fields in '[]' are optional, '<>' are required):
                 [browsable] default:'yes' or 'no'
                 [readonly] default:'yes' or 'no'
                 [guest] allowed default:'yes' or 'no'
+                NOTE: for user lists below, usernames are separated by ','
                 [users] allowed default:'all' or list of allowed users
                 [admins] allowed default:'none' or list of admin users
                 [writelist] list of users that can write to a RO share
