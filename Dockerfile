@@ -55,6 +55,8 @@ RUN apk --no-cache --no-progress upgrade && \
     echo '   fruit:advertise_fullsync = true' >>$file && \
     echo '   fruit:time machine = yes' >>$file && \
     echo '   smb2 leases = yes' >>$file && \
+    echo '   aio read size = 0' >>$file && \
+    echo '   aio write size = 0' >>$file && \
     echo '' >>$file && \
     rm -rf /tmp/*
 
