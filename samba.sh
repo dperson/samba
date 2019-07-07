@@ -81,7 +81,7 @@ perms() { local i file=/etc/samba/smb.conf
 #   none)
 # Return: result
 recycle() { local file=/etc/samba/smb.conf
-    sed -i '/recycle/d; /vfs/d' $file
+    sed -i '/recycle:/d; /vfs objects/s/ recycle / /' $file
 }
 
 ### share: Add share
