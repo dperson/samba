@@ -215,7 +215,7 @@ The 'command' (if provided and valid) will be run instead of samba
     exit $RC
 }
 
-[[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser&&unset USERID
+[[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
 [[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o users
 
 while getopts ":hc:g:i:nprs:Su:Ww:I:" opt; do
