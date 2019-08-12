@@ -119,6 +119,19 @@ Any of the commands can be run at creation with `docker run` or later with
 
 # User Feedback
 
+## Troubleshooting
+
+* You get the error `Access is denied` (or similar) on the client and/or see
+`change_to_user_internal: chdir_current_service() failed!` in the container
+logs.
+
+Add the `-p` option to the end of your options to the container, or set the
+`PERMISSIONS` environment variable.
+
+sudo docker run -it --name samba -p 139:139 -p 445:445 \
+            -v /path/to/directory:/mount \
+            -d dperson/samba -p
+
 ## Issues
 
 If you have any problems with or questions about this image, please contact me
