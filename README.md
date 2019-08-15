@@ -23,6 +23,10 @@ OR set local storage:
     sudo docker run -it --name samba -p 139:139 -p 445:445 \
                 -v /path/to/directory:/mount \
                 -d dperson/samba
+                
+OR complete example with permission and guest access
+
+sudo docker run -it -p 139:139 -p 445:445 -v /path/to/directory:/mount:z -d dperson/samba -s "mount;/mount;no;no;yes" -p
 
 ## Configuration
 
