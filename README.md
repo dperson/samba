@@ -128,9 +128,19 @@ logs.
 Add the `-p` option to the end of your options to the container, or set the
 `PERMISSIONS` environment variable.
 
-sudo docker run -it --name samba -p 139:139 -p 445:445 \
-            -v /path/to/directory:/mount \
-            -d dperson/samba -p
+    sudo docker run -it --name samba -p 139:139 -p 445:445 \
+                -v /path/to/directory:/mount \
+                -d dperson/samba -p
+
+* High memory usage by samba. Multiple people have reported high memory usage
+that's never freed by the samba processes. Recommended work around below:
+
+Add the `-m 512m` option to docker run command, or `mem_limit:` in
+docker_compose.yml files, IE:
+
+    sudo docker run -it --name samba -m 512m -p 139:139 -p 445:445 \
+                -v /path/to/directory:/mount \
+                -d dperson/samba -p
 
 ## Issues
 
