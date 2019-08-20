@@ -1,0 +1,110 @@
+kind: pipeline
+name: arm
+
+platform:
+  os: linux
+  arch: arm
+
+steps:
+- name: build
+  image: plugins/docker
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-arm
+    dockerfile: Dockerfile.armhf
+    password:
+      from_secret: docker_password
+    repo: dungtri/samba
+    username:
+      from_secret: docker_username
+    build_args:
+      - arch=arm
+
+  when:
+    event:
+    - push
+    - tag
+
+---
+
+kind: pipeline
+name: arm64
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+- name: build
+  image: plugins/docker
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-arm64
+    dockerfile: Dockerfile.aarch64
+    password:
+      from_secret: docker_password
+    repo: dungtri/samba
+    username:
+      from_secret: docker_username
+    build_args:
+      - arch=arm64v8
+
+  when:
+    event:
+    - push
+    - tag
+
+---
+
+kind: pipeline
+name: amd64
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build
+  image: plugins/docker
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-amd64
+    dockerfile: Dockerfile
+    password:
+      from_secret: docker_password
+    repo: dungtri/samba
+    username:
+      from_secret: docker_username
+    build_args:
+      - arch=amd64
+
+  when:
+    event:
+    - push
+    - tag
+
+---
+
+kind: pipeline
+name: manifest
+
+steps:
+- name: manifest
+  image: plugins/manifest
+  settings:
+    auto_tag: true
+    ignore_missing: true
+    spec: manifest.tmpl
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+  when:
+    event:
+    - push
+    - tag
+
+depends_on:
+  - amd64
+  - arm
+  - arm64
