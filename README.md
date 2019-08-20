@@ -1,5 +1,7 @@
 [![logo](https://raw.githubusercontent.com/dperson/samba/master/logo.jpg)](https://www.samba.org)
 
+[![Build Status](https://drone.dungtri.be/api/badges/dungtri/samba/status.svg)](https://drone.dungtri.be/dungtri/samba)
+
 # Samba
 
 Samba docker container
