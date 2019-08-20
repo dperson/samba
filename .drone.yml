@@ -11,7 +11,7 @@ steps:
   settings:
     auto_tag: true
     auto_tag_suffix: linux-arm
-    dockerfile: Dockerfile.armhf
+    dockerfile: Dockerfile
     password:
       from_secret: docker_password
     repo: dungtri/samba
@@ -40,7 +40,7 @@ steps:
   settings:
     auto_tag: true
     auto_tag_suffix: linux-arm64
-    dockerfile: Dockerfile.aarch64
+    dockerfile: Dockerfile
     password:
       from_secret: docker_password
     repo: dungtri/samba
