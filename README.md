@@ -142,6 +142,12 @@ docker_compose.yml files, IE:
                 -v /path/to/directory:/mount \
                 -d dperson/samba -p
 
+* Attempting to connect with the `smbclient` commandline tool. By default samba
+still tries to use SMB1, which is depriciated and has security issues. This
+container defaults to SMB2, which for no decernable reason even though it's
+supported is disabled by default so run the command as `smbclient -m SMB3`, then
+any other options you would specify.
+
 ## Issues
 
 If you have any problems with or questions about this image, please contact me
