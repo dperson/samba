@@ -1,8 +1,8 @@
-FROM balenalib/aarch64-alpine
+FROM arm64v8/alpine
+COPY qemu-aarch64-static /usr/bin/
 MAINTAINER David Personette <dperson@gmail.com>
 
 # Install samba
-RUN ["cross-build-start"]
 RUN apk --no-cache --no-progress upgrade && \
     apk --no-cache --no-progress add bash samba shadow tini && \
     addgroup -S smb && \
@@ -57,9 +57,10 @@ RUN apk --no-cache --no-progress upgrade && \
     echo '   fruit:advertise_fullsync = true' >>$file && \
     echo '   fruit:time machine = yes' >>$file && \
     echo '   smb2 leases = yes' >>$file && \
+    echo '   aio read size = 0' >>$file && \
+    echo '   aio write size = 0' >>$file && \
     echo '' >>$file && \
     rm -rf /tmp/*
-RUN ["cross-build-end"]
 
 COPY samba.sh /usr/bin/
 
