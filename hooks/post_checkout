@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+env
 set -x
 
 BUILD_ARCH=$(echo "${DOCKERFILE_PATH}" | cut -d'.' -f2)
