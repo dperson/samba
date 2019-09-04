@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-BUILD_ARCH=$(echo "${DOCKERFILE_PATH}" | cut -d'.' -f2)
-
-[ "${BUILD_ARCH}" == "Dockerfile" ] && \
+[[ "${DOCKER_TAG}" == "latest" ]] && \
     { echo 'qemu-user-static: Registration not required for this arch';exit 0; }
 
 docker run --rm --privileged multiarch/qemu-user-static:register --reset
