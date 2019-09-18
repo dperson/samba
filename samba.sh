@@ -30,7 +30,7 @@ charmap() { local chars="$1" file=/etc/samba/smb.conf
 
                 ' $file
 
-    sed -i '/catia:mappings/s/ =.*/ = '"$chars" $file
+    sed -i '/catia:mappings/s| =.*| = '"$chars"'|' $file
 }
 
 ### global: set a global config option
