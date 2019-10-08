@@ -1,0 +1,81 @@
+version: '3.3'
+
+# -s "<name;/path>[;browse;readonly;guest;users;admins;writelist;comment]" Configure a share
+# -u "<username;password>[;ID;group;GID]" Add a user
+services:
+  armv7l-linux:
+    image: dungtri/samba
+    command: [
+      "-u", "admin;secret",
+      "-s", "home;/share/home;yes;no;no;admin"
+    ]
+    environment:
+      - USERID=1000
+      - GROUPID=100
+    volumes:
+      - /home:/share/home
+    ports:
+      - { published: 137, target: 137, protocol: udp, mode: host }
+      - { published: 138, target: 138, protocol: udp, mode: host }
+      - { published: 139, target: 139, protocol: tcp, mode: host }
+      - { published: 445, target: 445, protocol: tcp, mode: host }
+      - { published: 445, target: 445, protocol: udp, mode: host }
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.platform.arch == armv7l
+          - node.platform.os == linux
+
+  x86-linux:
+    image: dungtri/samba
+    command: [
+      "-u", "admin;secret",
+      "-s", "home;/share/home;yes;no;no;admin"
+    ]
+    environment:
+      - USERID=1000
+      - GROUPID=100
+    volumes:
+      - /home:/share/home
+    ports:
+      - { published: 137, target: 137, protocol: udp, mode: host }
+      - { published: 138, target: 138, protocol: udp, mode: host }
+      - { published: 139, target: 139, protocol: tcp, mode: host }
+      - { published: 445, target: 445, protocol: tcp, mode: host }
+      - { published: 445, target: 445, protocol: udp, mode: host }
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.platform.arch == x86_64
+          - node.platform.os == linux
+
+  aarch64-linux:
+    image: dungtri/samba
+    command: [
+      "-u", "user1;secret1",
+      "-u", "user2;secret2",
+      "-s", "foo;/share/foo;yes;no;no;user1",
+      "-s", "bar;/share/bar;yes;no;no;user1,user2",
+      "-s", "data;/share/data;yes;no;no;user2"
+    ]
+    environment:
+      - USERID=1000
+      - GROUPID=100
+    volumes:
+      - /home/foo:/share/foo
+      - /home/bar:/share/bar
+      - /data:/share/data
+    ports:
+      - { published: 137, target: 137, protocol: udp, mode: host }
+      - { published: 138, target: 138, protocol: udp, mode: host }
+      - { published: 139, target: 139, protocol: tcp, mode: host }
+      - { published: 445, target: 445, protocol: tcp, mode: host }
+      - { published: 445, target: 445, protocol: udp, mode: host }
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.platform.arch == aarch64
+          - node.platform.os == linux
