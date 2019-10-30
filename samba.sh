@@ -244,7 +244,6 @@ while read i; do
     global "$i"
 done < <(env | awk '/^GLOBAL[0-9=_]/ {sub (/^[^=]*=/, "", $0); print}')
 [[ "${IMPORT:-""}" ]] && import "$IMPORT"
-[[ "${PERMISSIONS:-""}" ]] && perms
 [[ "${RECYCLE:-""}" ]] && recycle
 while read i; do
     eval share $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $i)
@@ -256,6 +255,7 @@ done < <(env | awk '/^USER[0-9=_]/ {sub (/^[^=]*=/, "", $0); print}')
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
 [[ "${WIDELINKS:-""}" ]] && widelinks
 [[ "${INCLUDE:-""}" ]] && include "$INCLUDE"
+[[ "${PERMISSIONS:-""}" ]] && perms
 
 if [[ $# -ge 1 && -x $(which $1 2>&-) ]]; then
     exec "$@"
