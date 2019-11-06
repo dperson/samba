@@ -24,7 +24,7 @@ RUN apk --no-cache --no-progress upgrade && \
     echo '   directory mask = 0775' >>$file && \
     echo '   force directory mode = 0775' >>$file && \
     echo '   force user = smbuser' >>$file && \
-    echo '   force group = users' >>$file && \
+    echo '   force group = smb' >>$file && \
     echo '   follow symlinks = yes' >>$file && \
     echo '   load printers = no' >>$file && \
     echo '   printing = bsd' >>$file && \
