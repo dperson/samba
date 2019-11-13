@@ -68,6 +68,11 @@ OR set local storage:
         -I          Add an include option at the end of the smb.conf
                     required arg: "<include file path>"
                     <include file path> in the container, e.g. a bind mount
+        -G  \"<groupname;username>[;GID]\"   Add a user to a secondary group
+                required arg: \"<groupname>;<username>\"
+                <groupname> for secondary group
+                <username> for user
+                [GID] for secondary group
 
     The 'command' (if provided and valid) will be run instead of samba
 
