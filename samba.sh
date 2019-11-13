@@ -146,6 +146,19 @@ user() { local name="$1" passwd="$2" id="${3:-""}" group="${4:-""}" \
     echo -e "$passwd\n$passwd" | smbpasswd -s -a "$name"
 }
 
+### group: assign user to secondary group
+#  Arguments:
+#  group) target group
+#  user) target user
+#  gid) if group does not exist set this id on add
+# Return: user added to group
+group() { local group="$1" user="$2" gid="${3:-""}"
+     [[ "$group" ]] && { grep -q "^$group:" /etc/group ||
+            addgroup ${gid:+--gid $gid }"$group"; }
+      grep -q -E "^$group:x:[[:digit:]]*.*[:,]$user(,|$)" /etc/group ||
+            usermod -a -G "$group" "$name"
+}
+
 ### workgroup: set the workgroup
 # Arguments:
 #   workgroup) the name to set
@@ -209,6 +222,11 @@ Options (fields in '[]' are optional, '<>' are required):
     -I          Add an include option at the end of the smb.conf
                 required arg: \"<include file path>\"
                 <include file path> in the container, e.g. a bind mount
+    -G  \"<groupname;username>[;GID]\"   Add a user to a secondary group
+                required arg: \"<groupname>;<username>\"
+                <groupname> for secondary group
+                <username> for user
+                [GID] for secondary group
 
 The 'command' (if provided and valid) will be run instead of samba
 " >&2
@@ -218,7 +236,7 @@ The 'command' (if provided and valid) will be run instead of samba
 [[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
 [[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o smb
 
-while getopts ":hc:g:i:nprs:Su:Ww:I:" opt; do
+while getopts ":hc:g:i:nprs:Su:Ww:I:G" opt; do
     case "$opt" in
         h) usage ;;
         c) charmap "$OPTARG" ;;
@@ -233,6 +251,7 @@ while getopts ":hc:g:i:nprs:Su:Ww:I:" opt; do
         w) workgroup "$OPTARG" ;;
         W) widelinks ;;
         I) include "$OPTARG" ;;
+        G) eval group $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $OPTARG) ;;
         "?") echo "Unknown option: -$OPTARG"; usage 1 ;;
         ":") echo "No argument value for option: -$OPTARG"; usage 2 ;;
     esac
@@ -252,6 +271,9 @@ done < <(env | awk '/^SHARE[0-9=_]/ {sub (/^[^=]*=/, "", $0); print}')
 while read i; do
     eval user $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $i)
 done < <(env | awk '/^USER[0-9=_]/ {sub (/^[^=]*=/, "", $0); print}')
+while read i; do
+    eval group $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $i)
+done < <(env | awk '/^GROUP[0-9=_]/ {sub (/^[^=]*=/, "", $0); print}')
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
 [[ "${WIDELINKS:-""}" ]] && widelinks
 [[ "${INCLUDE:-""}" ]] && include "$INCLUDE"

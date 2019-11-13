@@ -88,6 +88,7 @@ ENVIRONMENT VARIABLES
  * `USERID` - Set the UID for the samba server
  * `GROUPID` - Set the GID for the samba server
  * `INCLUDE` - As above, add a smb.conf include
+ * `GROUP` - As above, add a user to a secondary group (See NOTE3 below)
 
 **NOTE**: if you enable nmbd (via `-n` or the `NMBD` environment variable), you
 will also want to expose port 137 and 138 with `-p 137:137/udp -p 138:138/udp`.
