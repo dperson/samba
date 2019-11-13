@@ -236,7 +236,7 @@ The 'command' (if provided and valid) will be run instead of samba
 [[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
 [[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o smb
 
-while getopts ":hc:g:i:nprs:Su:Ww:I:G" opt; do
+while getopts ":hc:g:i:nprs:Su:Ww:I:G:" opt; do
     case "$opt" in
         h) usage ;;
         c) charmap "$OPTARG" ;;
