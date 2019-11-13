@@ -156,7 +156,7 @@ group() { local group="$1" user="$2" gid="${3:-""}"
      [[ "$group" ]] && { grep -q "^$group:" /etc/group ||
             addgroup ${gid:+--gid $gid }"$group"; }
       grep -q -E "^$group:x:[[:digit:]]*.*[:,]$user(,|$)" /etc/group ||
-            usermod -a -G "$group" "$name"
+            usermod -a -G "$group" "$user"
 }
 
 ### workgroup: set the workgroup
