@@ -30,7 +30,6 @@ RUN apk --no-cache --no-progress upgrade && \
     echo '   printing = bsd' >>$file && \
     echo '   printcap name = /dev/null' >>$file && \
     echo '   disable spoolss = yes' >>$file && \
-    echo '   socket options = TCP_NODELAY' >>$file && \
     echo '   strict locking = no' >>$file && \
     echo '   aio read size = 0' >>$file && \
     echo '   aio write size = 0' >>$file && \
