@@ -61,6 +61,7 @@ OR set local storage:
                     [ID] for user
                     [group] for user
                     [GID] for group
+        -b "<netbios_name>" Configure the netbios_name
         -w "<workgroup>"       Configure the workgroup (domain) samba should use
                     required arg: "<workgroup>"
                     <workgroup> for samba
