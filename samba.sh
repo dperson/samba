@@ -154,6 +154,14 @@ workgroup() { local workgroup="$1" file=/etc/samba/smb.conf
     sed -i 's|^\( *workgroup = \).*|\1'"$workgroup"'|' $file
 }
 
+### netbios: set the netbios name
+# Arguments:
+#   netbios) the name to set
+# Return: configure the correct netbios
+netbios() { local name="$1" file=/etc/samba/smb.conf
+    sed -i '/\[global\]/a netbios name="'$name'"' $file
+}
+
 ### widelinks: allow access wide symbolic links
 # Arguments:
 #   none)
@@ -202,6 +210,7 @@ Options (fields in '[]' are optional, '<>' are required):
                 [ID] for user
                 [group] for user
                 [GID] for group
+    -b \"<netbios_name>\"  Configure the netbios_name (default is the hostname)
     -w \"<workgroup>\"       Configure the workgroup (domain) samba should use
                 required arg: \"<workgroup>\"
                 <workgroup> for samba
@@ -218,7 +227,7 @@ The 'command' (if provided and valid) will be run instead of samba
 [[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
 [[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o smb
 
-while getopts ":hc:g:i:nprs:Su:Ww:I:" opt; do
+while getopts ":hc:g:i:nprs:Su:Ww:I:b:" opt; do
     case "$opt" in
         h) usage ;;
         c) charmap "$OPTARG" ;;
@@ -230,6 +239,7 @@ while getopts ":hc:g:i:nprs:Su:Ww:I:" opt; do
         s) eval share $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $OPTARG) ;;
         S) smb ;;
         u) eval user $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $OPTARG) ;;
+        b) netbios "$OPTARG" ;;
         w) workgroup "$OPTARG" ;;
         W) widelinks ;;
         I) include "$OPTARG" ;;
