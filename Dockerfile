@@ -39,6 +39,9 @@ RUN apk --no-cache --no-progress upgrade && \
     echo '   recycle:maxsize = 0' >>$file && \
     echo '   recycle:repository = .deleted' >>$file && \
     echo '   recycle:versions = yes' >>$file && \
+    echo '   os level = 255' >>$file && \
+    echo '   preferred master = yes' >>$file && \
+    echo '   domain master = yes' >>$file && \
     echo '' >>$file && \
     echo '   # Security' >>$file && \
     echo '   client ipc max protocol = SMB3' >>$file && \
