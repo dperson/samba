@@ -105,10 +105,12 @@ share() { local share="$1" path="$2" browsable="${3:-yes}" ro="${4:-yes}" \
     echo "   browsable = $browsable" >>$file
     echo "   read only = $ro" >>$file
     echo "   guest ok = $guest" >>$file
-    echo -n "   veto files = /._*/.apdisk/.AppleDouble/.DS_Store/" >>$file
-    echo -n ".TemporaryItems/.Trashes/desktop.ini/ehthumbs.db/" >>$file
-    echo "Network Trash Folder/Temporary Items/Thumbs.db/" >>$file
-    echo "   delete veto files = yes" >>$file
+    [[ $VETO == no ]] || {
+        echo -n "   veto files = /._*/.apdisk/.AppleDouble/.DS_Store/" >>$file
+        echo -n ".TemporaryItems/.Trashes/desktop.ini/ehthumbs.db/" >>$file
+        echo "Network Trash Folder/Temporary Items/Thumbs.db/" >>$file
+        echo "   delete veto files = yes" >>$file
+    }
     [[ ${users:-""} && ! ${users:-""} == all ]] &&
         echo "   valid users = $(tr ',' ' ' <<< $users)" >>$file
     [[ ${admins:-""} && ! ${admins:-""} =~ none ]] &&
