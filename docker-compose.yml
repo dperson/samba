@@ -21,7 +21,7 @@ services:
     volumes:
       - /mnt:/mnt:z
       - /mnt2:/mnt2:z
-    command: '-s "Mount;/mnt" -s "Bobs Volume;/mnt2;yes;no;no;bob" -u "bob;bobspasswd"'
+    command: '-s "Mount;/mnt" -s "Bobs Volume;/mnt2;yes;no;no;bob" -u "bob;bobspasswd" -p'
 
 networks:
   default:
