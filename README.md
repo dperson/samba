@@ -69,6 +69,7 @@ OR set local storage:
                     required arg: "<include file path>"
                     <include file path> in the container, e.g. a bind mount
         -f          No forcing the user to be smbuser
+        -F          No forcing the group to be smb
 
     The 'command' (if provided and valid) will be run instead of samba
 
@@ -90,6 +91,7 @@ ENVIRONMENT VARIABLES
  * `GROUPID` - Set the GID for the samba server
  * `INCLUDE` - As above, add a smb.conf include
  * `NOFORCEUSER` - No forcing the user to be smbuser
+ * `NOFORCEGROUP` - No forcing the group to be smb
 
 **NOTE**: if you enable nmbd (via `-n` or the `NMBD` environment variable), you
 will also want to expose port 137 and 138 with `-p 137:137/udp -p 138:138/udp`.
