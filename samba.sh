@@ -165,6 +165,14 @@ widelinks() { local file=/etc/samba/smb.conf \
     sed -i 's/\(follow symlinks = yes\)/'"$replace"'/' $file
 }
 
+### noforceuser: Disable forcing user to smbuser
+# Arguments:
+#   none)
+# Return: result
+noforceuser() { local file=/etc/samba/smb.conf
+    sed -i 's/\(   force user = smbuser\)/#\1/' $file
+}
+
 ### usage: Help
 # Arguments:
 #   none)
@@ -211,6 +219,7 @@ Options (fields in '[]' are optional, '<>' are required):
     -I          Add an include option at the end of the smb.conf
                 required arg: \"<include file path>\"
                 <include file path> in the container, e.g. a bind mount
+    -f          Disable forcing the user to smbuser.
 
 The 'command' (if provided and valid) will be run instead of samba
 " >&2
@@ -220,7 +229,7 @@ The 'command' (if provided and valid) will be run instead of samba
 [[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
 [[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o smb
 
-while getopts ":hc:g:i:nprs:Su:Ww:I:" opt; do
+while getopts ":hc:g:i:nprs:Su:Ww:I:f:" opt; do
     case "$opt" in
         h) usage ;;
         c) charmap "$OPTARG" ;;
@@ -235,6 +244,7 @@ while getopts ":hc:g:i:nprs:Su:Ww:I:" opt; do
         w) workgroup "$OPTARG" ;;
         W) widelinks ;;
         I) include "$OPTARG" ;;
+        f) noforceuser ;;
         "?") echo "Unknown option: -$OPTARG"; usage 1 ;;
         ":") echo "No argument value for option: -$OPTARG"; usage 2 ;;
     esac
@@ -257,6 +267,7 @@ done < <(env | awk '/^USER[0-9=_]/ {sub (/^[^=]*=/, "", $0); print}')
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
 [[ "${WIDELINKS:-""}" ]] && widelinks
 [[ "${INCLUDE:-""}" ]] && include "$INCLUDE"
+[[ "${NOFORCEUSER:-""}" ]] && noforceuser
 [[ "${PERMISSIONS:-""}" ]] && perms
 
 if [[ $# -ge 1 && -x $(which $1 2>&-) ]]; then
