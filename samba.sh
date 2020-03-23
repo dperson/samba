@@ -128,7 +128,7 @@ share() { local share="$1" path="$2" browsable="${3:-yes}" ro="${4:-yes}" \
 #   none)
 # Return: result
 smb() { local file=/etc/samba/smb.conf
-    sed -i '/min protocol/d' $file
+    sed -i '/\([^#]*min protocol *=\).*/\1 LANMAN1/' $file
 }
 
 ### user: add a user
