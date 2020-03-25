@@ -75,6 +75,7 @@ perms() { local i file=/etc/samba/smb.conf
         find $i -type f ! -perm 0664 -exec chmod 0664 {} \;
     done
 }
+export -f perms
 
 ### recycle: disable recycle bin
 # Arguments:
@@ -257,7 +258,7 @@ done < <(env | awk '/^USER[0-9=_]/ {sub (/^[^=]*=/, "", $0); print}')
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
 [[ "${WIDELINKS:-""}" ]] && widelinks
 [[ "${INCLUDE:-""}" ]] && include "$INCLUDE"
-[[ "${PERMISSIONS:-""}" ]] && perms
+[[ "${PERMISSIONS:-""}" ]] && perms &
 
 if [[ $# -ge 1 && -x $(which $1 2>&-) ]]; then
     exec "$@"
