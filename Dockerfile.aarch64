@@ -51,10 +51,6 @@ RUN apk --no-cache --no-progress upgrade && \
     echo '' >>$file && \
     echo '   # Time Machine' >>$file && \
     echo '   fruit:delete_empty_adfiles = yes' >>$file && \
-    echo '   fruit:metadata = stream' >>$file && \
-    echo '   fruit:model = MacSamba' >>$file && \
-    echo '   fruit:posix_rename = yes' >>$file && \
-    echo '   fruit:resource = file' >>$file && \
     echo '   fruit:time machine = yes' >>$file && \
     echo '   fruit:veto_appledouble = no' >>$file && \
     echo '   fruit:wipe_intentionally_left_blank_rfork = yes' >>$file && \

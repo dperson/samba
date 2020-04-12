@@ -1,0 +1,16 @@
+image: dperson/samba:latest
+manifests:
+  - image: dperson/samba:amd64
+    platform:
+      architecture: amd64
+      os: linux
+  - image: dperson/samba:aarch64
+    platform:
+      architecture: arm64
+      os: linux
+      variant: v8
+  - image: dperson/samba:armhf
+    platform:
+      architecture: arm
+      os: linux
+      variant: v6

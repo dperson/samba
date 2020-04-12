@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 
-[[ "${DOCKER_TAG}" == "latest" ]] && \
+API="https://api.github.com/repos/estesp/manifest-tool/tags"
+URL="https://github.com/estesp/manifest-tool/releases/download"
+TAG=$(curl -Ls $API | awk -F'"' '/name.*v[0-9]/ {print $4; exit}')
+curl -LSso manifest-tool "${URL}/${TAG}/manifest-tool-linux-amd64"
+chmod +x manifest-tool
+
+[[ "${DOCKER_TAG}" == "amd64" ]] && \
     { echo 'qemu-user-static: Download not required for this arch'; exit 0; }
 
-TAGS_API="https://api.github.com/repos/multiarch/qemu-user-static/tags"
+API="https://api.github.com/repos/multiarch/qemu-user-static/tags"
 URL="https://github.com/multiarch/qemu-user-static/releases/download"
-LATEST_TAG=$(curl -Ls $TAGS_API | \
-            awk -F'"' '/name.*v[0-9]/ {print $4; exit}')
+TAG=$(curl -Ls $API | awk -F'"' '/name.*v[0-9]/ {print $4; exit}')
 ARCH=$([[ "${DOCKER_TAG}" == "armhf" ]] && \
             echo "${DOCKER_TAG::-2}" || echo "${DOCKER_TAG}")
 
-curl -Ls "${URL}/${LATEST_TAG}/x86_64_qemu-${ARCH}-static.tar.gz" | \
-            tar xzv
+curl -LSs "${URL}/${TAG}/x86_64_qemu-${ARCH}-static.tar.gz" | tar xzv

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-[[ "${DOCKER_TAG}" == "latest" ]] && \
+[[ "${DOCKER_TAG}" == "amd64" ]] && \
     { echo 'qemu-user-static: Registration not required for this arch';exit 0; }
 
 docker run --rm --privileged multiarch/qemu-user-static:register --reset
