@@ -32,8 +32,11 @@ OR set local storage:
         -h          This help
         -c "<from:to>" setup character mapping for file/directory names
                     required arg: "<from:to>" character mappings separated by ','
+        -G "<section;parameter>" Provide generic section option for smb.conf
+                    required arg: "<section>" - IE: "share"
+                    required arg: "<parameter>" - IE: "log level = 2"
         -g "<parameter>" Provide global option for smb.conf
-                    required arg: "<parameter>" - IE: -g "log level = 2"
+                    required arg: "<parameter>" - IE: "log level = 2"
         -i "<path>" Import smbpassword
                     required arg: "<path>" - full file path in container
         -n          Start the 'nmbd' daemon to advertise the shares
@@ -74,6 +77,7 @@ OR set local storage:
 ENVIRONMENT VARIABLES
 
  * `CHARMAP` - As above, configure character mapping
+ * `GENERIC` - As above, configure a generic section option (See NOTE3 below)
  * `GLOBAL` - As above, configure a global option (See NOTE3 below)
  * `IMPORT` - As above, import a smbpassword file
  * `NMBD` - As above, enable nmbd

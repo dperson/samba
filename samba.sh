@@ -33,15 +33,32 @@ charmap() { local chars="$1" file=/etc/samba/smb.conf
     sed -i '/catia:mappings/s| =.*| = '"$chars"'|' $file
 }
 
+### generic: set a generic config option in a section
+# Arguments:
+#   section) section of config file
+#   option) raw option
+# Return: line added to smb.conf (replaces existing line with same key)
+generic() { local section="$1" key="$(sed 's| *=.*||' <<< $2)" \
+            value="$(sed 's|.*= *||' <<< $2)" file=/etc/samba/smb.conf
+    if sed -n '/^\['"$section"'\]/,/^\[/p' $file | grep -qE '^;*\s*'"$key"; then
+        sed -i '/^\['"$1"'\]/,/^\[/s|^;*\s*\('"$key"' = \).*|   \1'"$value"'|' \
+                    "$file"
+    else
+        sed -i '/\['"$section"'\]/a \   '"$key = $value" "$file"
+    fi
+}
+
 ### global: set a global config option
 # Arguments:
 #   option) raw option
 # Return: line added to smb.conf (replaces existing line with same key)
-global() { local key="${1%%=*}" value="${1#*=}" file=/etc/samba/smb.conf
-    if grep -qE '^;*\s*'"$key" "$file"; then
-        sed -i 's|^;*\s*'"$key"'.*|   '"${key% } = ${value# }"'|' "$file"
+global() { local key="$(sed 's| *=.*||' <<< $1)" \
+            value="$(sed 's|.*= *||' <<< $1)" file=/etc/samba/smb.conf
+    if sed -n '/^\[global\]/,/^\[/p' $file | grep -qE '^;*\s*'"$key"; then
+        sed -i '/^\[global\]/,/^\[/s|^;*\s*\('"$key"' = \).*|   \1'"$value"'|' \
+                    "$file"
     else
-        sed -i '/\[global\]/a \   '"${key% } = ${value# }" "$file"
+        sed -i '/\[global\]/a \   '"$key = $value" "$file"
     fi
 }
 
@@ -176,8 +193,11 @@ Options (fields in '[]' are optional, '<>' are required):
     -h          This help
     -c \"<from:to>\" setup character mapping for file/directory names
                 required arg: \"<from:to>\" character mappings separated by ','
+    -G \"<section;parameter>\" Provide generic section option for smb.conf
+                required arg: \"<section>\" - IE: \"share\"
+                required arg: \"<parameter>\" - IE: \"log level = 2\"
     -g \"<parameter>\" Provide global option for smb.conf
-                    required arg: \"<parameter>\" - IE: -g \"log level = 2\"
+                required arg: \"<parameter>\" - IE: \"log level = 2\"
     -i \"<path>\" Import smbpassword
                 required arg: \"<path>\" - full file path in container
     -n          Start the 'nmbd' daemon to advertise the shares
@@ -221,10 +241,11 @@ The 'command' (if provided and valid) will be run instead of samba
 [[ "${USERID:-""}" =~ ^[0-9]+$ ]] && usermod -u $USERID -o smbuser
 [[ "${GROUPID:-""}" =~ ^[0-9]+$ ]] && groupmod -g $GROUPID -o smb
 
-while getopts ":hc:g:i:nprs:Su:Ww:I:" opt; do
+while getopts ":hc:G:g:i:nprs:Su:Ww:I:" opt; do
     case "$opt" in
         h) usage ;;
         c) charmap "$OPTARG" ;;
+        G) eval generic $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $OPTARG) ;;
         g) global "$OPTARG" ;;
         i) import "$OPTARG" ;;
         n) NMBD="true" ;;
@@ -243,6 +264,9 @@ done
 shift $(( OPTIND - 1 ))
 
 [[ "${CHARMAP:-""}" ]] && charmap "$CHARMAP"
+while read i; do
+    eval generic $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $i)
+done < <(env | awk '/^GENERIC[0-9=_]/ {sub (/^[^=]*=/, "", $0); print}')
 while read i; do
     global "$i"
 done < <(env | awk '/^GLOBAL[0-9=_]/ {sub (/^[^=]*=/, "", $0); print}')
