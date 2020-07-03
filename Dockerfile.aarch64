@@ -34,8 +34,7 @@ RUN apk --no-cache --no-progress upgrade && \
     echo '   strict locking = no' >>$file && \
     echo '   aio read size = 0' >>$file && \
     echo '   aio write size = 0' >>$file && \
-    echo '   vfs objects = acl_xattr catia fruit recycle streams_xattr' \
-                >>$file && \
+    echo '   vfs objects = catia fruit recycle streams_xattr' >>$file && \
     echo '   recycle:keeptree = yes' >>$file && \
     echo '   recycle:maxsize = 0' >>$file && \
     echo '   recycle:repository = .deleted' >>$file && \
