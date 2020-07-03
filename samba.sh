@@ -52,8 +52,8 @@ generic() { local section="$1" key="$(sed 's| *=.*||' <<< $2)" \
 # Arguments:
 #   option) raw option
 # Return: line added to smb.conf (replaces existing line with same key)
-global() { local key="$(sed 's|\([^=]*\) += .*|\1|' <<< $1)" \
-            value="$(sed 's|[^=]* += +||' <<< $1)" file=/etc/samba/smb.conf
+global() { local key="$(sed 's|\([^=]*\) \+= .*|\1|' <<< $1)" \
+            value="$(sed 's|[^=]* \+= \+||' <<< $1)" file=/etc/samba/smb.conf
     if sed -n '/^\[global\]/,/^\[/p' $file | grep -qE '^;*\s*'"$key"; then
         sed -i '/^\[global\]/,/^\[/s|^;*\s*\('"$key"' = \).*|   \1'"$value"'|' \
                     "$file"
