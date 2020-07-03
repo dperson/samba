@@ -39,7 +39,7 @@ charmap() { local chars="$1" file=/etc/samba/smb.conf
 #   option) raw option
 # Return: line added to smb.conf (replaces existing line with same key)
 generic() { local section="$1" key="$(sed 's| *=.*||' <<< $2)" \
-            value="$(sed 's|.*= *||' <<< $2)" file=/etc/samba/smb.conf
+            value="$(sed 's|[^=]*= *||' <<< $2)" file=/etc/samba/smb.conf
     if sed -n '/^\['"$section"'\]/,/^\[/p' $file | grep -qE '^;*\s*'"$key"; then
         sed -i '/^\['"$1"'\]/,/^\[/s|^;*\s*\('"$key"' = \).*|   \1'"$value"'|' \
                     "$file"
@@ -52,8 +52,8 @@ generic() { local section="$1" key="$(sed 's| *=.*||' <<< $2)" \
 # Arguments:
 #   option) raw option
 # Return: line added to smb.conf (replaces existing line with same key)
-global() { local key="$(sed 's|\([^=]*\) += .*|\1|' <<< $1)" \
-            value="$(sed 's|[^=]* += +||' <<< $1)" file=/etc/samba/smb.conf
+global() { local key="$(sed 's| *=.*||' <<< $1)" \
+            value="$(sed 's|[^=]*= *||' <<< $1)" file=/etc/samba/smb.conf
     if sed -n '/^\[global\]/,/^\[/p' $file | grep -qE '^;*\s*'"$key"; then
         sed -i '/^\[global\]/,/^\[/s|^;*\s*\('"$key"' = \).*|   \1'"$value"'|' \
                     "$file"
