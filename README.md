@@ -89,8 +89,8 @@ ENVIRONMENT VARIABLES
  * `USER` - As above, setup a user (See NOTE3 below)
  * `WIDELINKS` - As above, allow access wide symbolic links
  * `WORKGROUP` - As above, set workgroup
- * `USERID` - Set the UID for the samba server
- * `GROUPID` - Set the GID for the samba server
+ * `USERID` - Set the UID for the samba server's default user (smbuser)
+ * `GROUPID` - Set the GID for the samba server's default user (smbuser)
  * `INCLUDE` - As above, add a smb.conf include
 
 **NOTE**: if you enable nmbd (via `-n` or the `NMBD` environment variable), you
@@ -135,6 +135,10 @@ Add the `-p` option to the end of your options to the container, or set the
     sudo docker run -it --name samba -p 139:139 -p 445:445 \
                 -v /path/to/directory:/mount \
                 -d dperson/samba -p
+
+If changing the permissions of your files is not possible in your setup you
+can instead set the environment variables `USERID` and `GROUPID` to the
+values of the owner of your files.
 
 * High memory usage by samba. Multiple people have reported high memory usage
 that's never freed by the samba processes. Recommended work around below:
