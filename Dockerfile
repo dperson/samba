@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:3.16.3
 MAINTAINER David Personette <dperson@gmail.com>
 
 # Install samba
