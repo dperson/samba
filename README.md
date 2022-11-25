@@ -152,7 +152,7 @@ docker_compose.yml files, IE:
 
 * Attempting to connect with the `smbclient` commandline tool. By default samba
 still tries to use SMB1, which is deprecated and has security issues. This
-container defaults to SMB2, which for no discernible reason even though it's
+container defaults to SMB2, which for no discernible reason even though its
 support is disabled by default. So run the command as `smbclient -m SMB3`, then
 any other options you would specify.
 
