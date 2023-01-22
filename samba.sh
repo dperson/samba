@@ -18,6 +18,10 @@
 
 set -o nounset                              # Treat unset variables as an error
 
+debug() {
+    echo "$@" 1>&2  ## Send message to stderr.
+}
+
 ### charmap: setup character mapping for file/directory names
 # Arguments:
 #   chars) from:to character mappings separated by ','
@@ -76,7 +80,7 @@ include() { local includefile="$1" file=/etc/samba/smb.conf
 # Return: user(s) added to container
 import() { local file="$1" name id
     while read name id; do
-        grep -q "^$name:" /etc/passwd || adduser -D -H -u "$id" "$name"
+        grep -q "^$name:" /etc/passwd || adduser --disabled-password --system --no-create-home --uid "$id" "$name"
     done < <(cut -d: -f1,2 $file | sed 's/:/ /')
     pdbedit -i smbpasswd:$file
 }
@@ -161,9 +165,12 @@ user() { local name="$1" passwd="$2" id="${3:-""}" group="${4:-""}" \
                 gid="${5:-""}"
     [[ "$group" ]] && { grep -q "^$group:" /etc/group ||
                 addgroup ${gid:+--gid $gid }"$group"; }
+    echo "About to create user"
     grep -q "^$name:" /etc/passwd ||
-        adduser -D -H ${group:+-G $group} ${id:+-u $id} "$name"
+        adduser --gecos "${name}" --disabled-password ${group:+--ingroup $group} ${id:+--uid $id} "$name"
+    echo "Post create user, setting smbpasswd"
     echo -e "$passwd\n$passwd" | smbpasswd -s -a "$name"
+    echo "Post smbpasswd"
 }
 
 ### workgroup: set the workgroup
