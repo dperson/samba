@@ -5,6 +5,7 @@ task :buildx => [:multiarch_build]
 task :b => [:multiarch_build]
 
 CONTAINER_NAME = 'unixorn/deban-samba'
+IMAGE_VERSION = `date +%Y-%m-%d-%H%M`.strip()
 
 task :usage do
   puts 'Usage:'
@@ -19,8 +20,9 @@ desc 'Use buildx to make a multi-arch container'
 task :multiarch_build do
   puts "Building #{CONTAINER_NAME}"
   # Build on all supported architectures
-  sh %{ docker buildx build --platform linux/amd64,linux/arm/v7,linux/arm64 --push -t #{CONTAINER_NAME} .}
+  sh %{ docker buildx build --platform linux/amd64,linux/arm/v7,linux/arm64 --push -t "#{CONTAINER_NAME}:#{IMAGE_VERSION}" .}
   # You can't build and load in the same command, so pull the arch we're running on- at least it'll be in cache
+  sh %{ docker pull #{CONTAINER_NAME}:#{IMAGE_VERSION} }
   sh %{ docker pull #{CONTAINER_NAME} }
 end
 
