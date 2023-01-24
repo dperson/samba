@@ -18,7 +18,9 @@ end
 desc 'Use buildx to make a multi-arch container'
 task :multiarch_build do
   puts "Building #{CONTAINER_NAME}"
+  # Build on all supported architectures
   sh %{ docker buildx build --platform linux/amd64,linux/arm/v7,linux/arm64 --push -t #{CONTAINER_NAME} .}
+  # You can't build and load in the same command, so pull the arch we're running on- at least it'll be in cache
   sh %{ docker pull #{CONTAINER_NAME} }
 end
 
@@ -26,7 +28,7 @@ end
 desc 'Use buildx to make a local container for testing'
 task :local do
   puts "Building #{CONTAINER_NAME}"
-  sh %{ docker buildx build --load -t #{CONTAINER_NAME} .}
+  sh %{ docker buildx build --load -t #{CONTAINER_NAME}-testing .}
 end
 
 desc 'Lint the Dockerfile'
