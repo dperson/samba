@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+#
+# Copyright 2023 Joe Block <jpb@unixorn.net>
+# License: Apache 2.0
+
+set -o pipefail
+if [[ -n "$DEBUG" ]]; then
+  set -x
+fi
+
+function debug() {
+  if [[ -n "$DEBUG" ]]; then
+    echo "$@"
+  fi
+}
+
+function echo-stderr() {
+  echo "$@" 1>&2  ## Send message to stderr.
+}
+
+function fail() {
+  printf '%s\n' "$1" >&2  ## Send message to stderr. Exclude >&2 if you don't want it that way.
+  exit "${2-1}"  ## Return a code specified by $2 or 1 by default.
+}
+
+function has() {
+  # Check if a command is in $PATH
+  which "$@" > /dev/null 2>&1
+}
+
+# on_exit and add_on_exit from http://www.linuxjournal.com/content/use-bash-trap-statement-cleanup-temporary-files
+
+# Usage:
+#   add_on_exit rm -f /tmp/foo
+#   add_on_exit echo "I am exiting"
+#   tempfile=$(mktemp)
+#   add_on_exit rm -f "$tempfile"
+
+function on_exit()
+{
+  for i in "${on_exit_items[@]}"
+  do
+    eval $i
+  done
+}
+
+function add_on_exit()
+{
+  local n=${#on_exit_items[*]}
+  on_exit_items[$n]="$*"
+  if [[ $n -eq 0 ]]; then
+    trap on_exit EXIT
+  fi
+}
+
+# Set up a working scratch directory
+SCRATCH_D=$(mktemp -d)
+
+if [[ ! "$SCRATCH_D" || ! -d "$SCRATCH_D" ]]; then
+  echo "Could not create temp dir"
+  exit 1
+fi
+
+function update-config()
+{
+  sed -i '/Share Definitions/,$d' "$samba_config_f"
+  sed -i 's|^;* *\(default case = \).*|   \1lower|' "$samba_config_f"
+  sed -i 's|^;* *\(load printers = \).*|   \1no|' "$samba_config_f"
+  sed -i 's|^;* *\(log file = \).*|   \1/dev/stdout|' "$samba_config_f"
+  sed -i 's|^;* *\(preserve case = \).*|   \1yes|' "$samba_config_f"
+  sed -i 's|^;* *\(printcap name = \).*|   \1/dev/null|' "$samba_config_f"
+  sed -i 's|^;* *\(printing = \).*|   \1bsd|' "$samba_config_f"
+  sed -i 's|^;* *\(short preserve case = \).*|   \1yes|' "$samba_config_f"
+  sed -i 's|^;* *\(unix password sync = \).*|   \1no|' "$samba_config_f"
+  sed -i "s/workgroup = WORKGROUP/workgroup = $workgroup/" "$samba_config_f"
+
+  # echo '   pam password change = yes' >> $samba_config_f
+  # echo '   map to guest = bad user' >> $samba_config_f
+
+  echo '   usershare allow guests = yes' >> "$samba_config_f"
+  echo '   create mask = 0664' >> "$samba_config_f"
+  echo '   force create mode = 0664' >> "$samba_config_f"
+  echo '   directory mask = 0775' >> "$samba_config_f"
+  echo '   force directory mode = 0775' >> "$samba_config_f"
+
+  echo '   force user = smbuser' >> "$samba_config_f"
+  echo '   force group = smb' >> "$samba_config_f"
+
+  echo '   follow symlinks = yes' >> "$samba_config_f"
+  echo '   load printers = no' >> "$samba_config_f"
+  echo '   printing = bsd' >> "$samba_config_f"
+  echo '   printcap name = /dev/null' >> "$samba_config_f"
+  echo '   disable spoolss = yes' >> "$samba_config_f"
+  echo '   strict locking = no' >> "$samba_config_f"
+
+  echo '   aio read size = 0' >> "$samba_config_f"
+  echo '   aio write size = 0' >> "$samba_config_f"
+
+  echo '   vfs objects = catia fruit recycle streams_xattr' >> "$samba_config_f"
+
+  echo '   recycle:keeptree = yes' >> "$samba_config_f"
+  echo '   recycle:maxsize = 0' >> "$samba_config_f"
+  echo '   recycle:repository = .deleted' >> "$samba_config_f"
+  echo '   recycle:versions = yes' >> "$samba_config_f"
+  echo '' >> "$samba_config_f"
+
+  echo '   # Security' >> "$samba_config_f"
+  echo '   client ipc max protocol = SMB3' >> "$samba_config_f"
+  echo '   client ipc min protocol = SMB2_10' >> "$samba_config_f"
+  echo '   client max protocol = SMB3' >> "$samba_config_f"
+  echo '   client min protocol = SMB2_10' >> "$samba_config_f"
+  echo '   server max protocol = SMB3' >> "$samba_config_f"
+  echo '   server min protocol = SMB2_10' >> "$samba_config_f"
+  echo '' >> "$samba_config_f"
+
+  echo '   # Time Machine' >> "$samba_config_f"
+  echo '   fruit:delete_empty_adfiles = yes' >> "$samba_config_f"
+  echo '   fruit:time machine = yes' >> "$samba_config_f"
+  echo '   fruit:veto_appledouble = no' >> "$samba_config_f"
+  echo '   fruit:wipe_intentionally_left_blank_rfork = yes' >> "$samba_config_f"
+  echo '' >> "$samba_config_f"
+}
+
+workgroup="${WORKGROUP:-CATTERY}"
+echo-stderr "workgroup: $workgroup"
+add_on_exit rm -rf "$SCRATCH_D"
+samba_config_f="/etc/samba/smb.conf"
+update-config

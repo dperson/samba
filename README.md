@@ -1,20 +1,40 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Table of Contents
+
+- [Samba](#samba)
+  - [What is Samba?](#what-is-samba)
+  - [How to use this image](#how-to-use-this-image)
+    - [Hosting a Samba instance](#hosting-a-samba-instance)
+      - [Configuration](#configuration)
+    - [Examples](#examples)
+      - [Setting the Timezone](#setting-the-timezone)
+      - [Start an instance creating users and shares:](#start-an-instance-creating-users-and-shares)
+        - [docker run](#docker-run)
+        - [docker-compose](#docker-compose)
+  - [User Feedback](#user-feedback)
+    - [Troubleshooting](#troubleshooting)
+    - [Issues](#issues)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 [![logo](https://raw.githubusercontent.com/dperson/samba/master/logo.jpg)](https://www.samba.org)
 
 # Samba
 
 Samba docker container
 
-# What is Samba?
+## What is Samba?
 
 Since 1992, Samba has provided secure, stable and fast file and print services
 for all clients using the SMB/CIFS protocol, such as all versions of DOS and
 Windows, OS/2, Linux and many others.
 
-# How to use this image
+## How to use this image
 
-By default there are no shares configured, additional ones can be added.
+By default there are no shares configured, additional ones must be added.
 
-## Hosting a Samba instance
+### Hosting a Samba instance
 
     sudo docker run -it -p 139:139 -p 445:445 -d dperson/samba -p
 
@@ -24,7 +44,7 @@ OR set local storage:
                 -v /path/to/directory:/mount \
                 -d dperson/samba -p
 
-## Configuration
+#### Configuration
 
     sudo docker run -it --rm dperson/samba -h
     Usage: samba.sh [-opt] [command]
@@ -102,16 +122,18 @@ container configured to use the hosts network stack.
 **NOTE3**: optionally supports additional variables starting with the same name,
 IE `SHARE` also will work for `SHARE2`, `SHARE3`... `SHAREx`, etc.
 
-## Examples
+### Examples
 
 Any of the commands can be run at creation with `docker run` or later with
 `docker exec -it samba samba.sh` (as of version 1.3 of docker).
 
-### Setting the Timezone
+#### Setting the Timezone
 
     sudo docker run -it -e TZ=EST5EDT -p 139:139 -p 445:445 -d dperson/samba -p
 
-### Start an instance creating users and shares:
+#### Start an instance creating users and shares:
+
+##### docker run
 
     sudo docker run -it -p 139:139 -p 445:445 -d dperson/samba -p \
                 -u "example1;badpass" \
@@ -119,11 +141,50 @@ Any of the commands can be run at creation with `docker run` or later with
                 -s "public;/share" \
                 -s "users;/srv;no;no;no;example1,example2" \
                 -s "example1 private share;/example1;no;no;no;example1" \
-                -s "example2 private share;/example2;no;no;no;example2"
+                -s "example2 private share;/example2;no;no;no;example2" \
+                -s "public1;/public1;yes;no;yes;example1,example2"
 
-# User Feedback
+If you want files to be written with the individual userids so that the permissions are identical on the host running samba, add `-g "force user ="` to your `docker run` command.
 
-## Troubleshooting
+##### docker-compose
+
+```yaml
+version: '3.4'
+
+services:
+  samba:
+    image: unixorn/debian-samba
+    environment:
+      TZ: 'EST5EDT'
+    networks:
+      - default
+    ports:
+      - "137:137/udp"
+      - "138:138/udp"
+      - "139:139/tcp"
+      - "445:445/tcp"
+    read_only: true
+    tmpfs:
+      - /tmp
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    volumes:
+      - /mnt:/mnt:z
+      - /mnt2:/mnt2:z
+    command: '-s "Mount;/mnt" -s "Bobs Volume;/mnt2;yes;no;no;bob" -u "bob;bobspasswd" -p'
+
+networks:
+  default:
+```
+
+Add `-g 'force user = ""'` to the `command` key to make the files shared by samba have individual UIDs instead of all sharing the same user. This will keep permissions outside the container working the same as permissions inside the container.
+
+You'll also have to set the userid in the `-u` commands. Adding `-u "username2;password2;1234;groupname;5678"` will set `username2` to have uid 1234, be a member of group `groupname`, and set `groupname`'s gid to 5678.
+
+## User Feedback
+
+### Troubleshooting
 
 * You get the error `Access is denied` (or similar) on the client and/or see
 `change_to_user_internal: chdir_current_service() failed!` in the container
@@ -156,7 +217,7 @@ container defaults to SMB2, which for no decernable reason even though it's
 supported is disabled by default so run the command as `smbclient -m SMB3`, then
 any other options you would specify.
 
-## Issues
+### Issues
 
 If you have any problems with or questions about this image, please contact me
 through a [GitHub issue](https://github.com/dperson/samba/issues).
