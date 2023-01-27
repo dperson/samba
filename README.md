@@ -172,15 +172,17 @@ services:
     volumes:
       - /mnt:/mnt:z
       - /mnt2:/mnt2:z
-    command: '-s "Mount;/mnt" -s "Bobs Volume;/mnt2;yes;no;no;bob" -u "bob;bobspasswd" -p'
+    command: '-g "netbios name = SERVERNAME" -s "Mount;/mnt" -s "Bobs Volume;/mnt2;yes;no;no;bob" -u "bob;bobspasswd" -p'
 
 networks:
   default:
 ```
 
-Add `-g 'force user = ""'` to the `command` key to make the files shared by samba have individual UIDs instead of all sharing the same user. This will keep permissions outside the container working the same as permissions inside the container.
+Add `-g 'force user = ""'` to the `command` key (and remove the `-p`) to make the files shared by samba have individual UIDs instead of all sharing the same user. This will keep permissions outside the container working the same as permissions inside the container.
 
 You'll also have to set the userid in the `-u` commands. Adding `-u "username2;password2;1234;groupname;5678"` will set `username2` to have uid 1234, be a member of group `groupname`, and set `groupname`'s gid to 5678.
+
+Add `-g "netbios name = SERVERNAME"` to set the server name so you can refer to it as `smb://SERVERNAME`
 
 ## User Feedback
 
