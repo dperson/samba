@@ -1,5 +1,5 @@
-FROM alpine
-MAINTAINER David Personette <dperson@gmail.com>
+FROM alpine:3.18
+LABEL MAINTAINER Andrew Sarver <asarver@sarverenterprises.com>
 
 # Install samba
 RUN apk --no-cache --no-progress upgrade && \
