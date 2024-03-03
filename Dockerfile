@@ -1,9 +1,10 @@
-FROM alpine
+FROM alpine:latest
 MAINTAINER David Personette <dperson@gmail.com>
 
 # Install samba
-RUN apk --no-cache --no-progress upgrade && \
-    apk --no-cache --no-progress add bash samba shadow tini tzdata && \
+RUN apk update && \
+    apk upgrade && \
+    apk add bash samba shadow tini tzdata && \
     addgroup -S smb && \
     adduser -S -D -H -h /tmp -s /sbin/nologin -G smb -g 'Samba User' smbuser &&\
     file="/etc/samba/smb.conf" && \
@@ -55,7 +56,7 @@ RUN apk --no-cache --no-progress upgrade && \
     echo '' >>$file && \
     rm -rf /tmp/*
 
-COPY samba.sh /usr/bin/
+ADD samba.sh /usr/bin/samba.sh
 
 EXPOSE 137/udp 138/udp 139 445
 
