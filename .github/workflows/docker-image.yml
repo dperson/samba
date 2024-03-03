@@ -36,6 +36,8 @@ jobs:
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      - name: Perform Scan
+        uses: ShiftLeftSecurity/scan-action@master
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -47,3 +49,12 @@ jobs:
             ${{ env.GHCR }}/vremenar/${{ env.IMAGENAME }}:${{ steps.date.outputs.date }}
             ${{ env.DOCKER }}/vremenar/${{ env.IMAGENAME }}:latest
             ${{ env.DOCKER }}/vremenar/${{ env.IMAGENAME }}:${{ steps.date.outputs.date }}
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ env.GHCR }}/vremenar/${{ env.IMAGENAME }}:latest'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
